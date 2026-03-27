@@ -1,0 +1,758 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Claude AI Playbook for IT Admin / IT Support</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,400&family=Instrument+Serif:ital@0;1&family=Noto+Sans+Thai:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --blue: #2563eb; --blue-dark: #1d4ed8; --blue-light: #eff6ff;
+      --blue-mid: #dbeafe; --cyan: #0ea5e9; --green: #059669;
+      --orange: #f59e0b; --red: #ef4444;
+      --body-bg: #f0f5ff; --card-bg: #ffffff;
+      --text-dark: #0f172a; --text-mid: #475569; --text-light: #94a3b8;
+      --border: rgba(37,99,235,0.12); --border-mid: rgba(37,99,235,0.22);
+    }
+
+    body { font-family:'DM Sans','Noto Sans Thai',sans-serif; background:var(--body-bg); color:var(--text-dark); line-height:1.7; }
+
+    /* NAV */
+    nav { background:#fff; border-bottom:1px solid var(--border); box-shadow:0 1px 12px rgba(37,99,235,.08);
+      padding:0 2rem; display:flex; align-items:center; justify-content:space-between; height:64px; position:sticky; top:0; z-index:100; }
+    .nav-brand { font-family:'Instrument Serif',serif; font-size:1.25rem; color:var(--blue-dark); }
+    .nav-links { display:flex; gap:.4rem; }
+    .nav-links a { text-decoration:none; color:var(--text-mid); font-size:.875rem; font-weight:500;
+      padding:.35rem .9rem; border-radius:999px; transition:all .2s; }
+    .nav-links a:hover { color:var(--blue); background:var(--blue-light); }
+    .nav-links a.active { background:var(--blue); color:#fff; }
+
+    /* HERO */
+    .hero { background:linear-gradient(135deg,#1d4ed8 0%,#0369a1 60%,#0891b2 100%);
+      padding:5rem 2rem 4rem; text-align:center; position:relative; overflow:hidden; }
+    .hero::before { content:''; position:absolute; inset:0;
+      background-image:linear-gradient(rgba(255,255,255,.04) 1px,transparent 1px),
+        linear-gradient(90deg,rgba(255,255,255,.04) 1px,transparent 1px);
+      background-size:40px 40px; pointer-events:none; }
+    .hero-tag { display:inline-block; border:1px solid rgba(255,255,255,.35);
+      color:rgba(255,255,255,.9); font-size:.72rem; font-weight:600; letter-spacing:.12em;
+      text-transform:uppercase; padding:.3rem 1rem; border-radius:999px; margin-bottom:1.5rem; }
+    .hero h1 { font-family:'Instrument Serif',serif; font-size:clamp(2.2rem,5.5vw,4rem);
+      color:#fff; line-height:1.1; margin-bottom:1.25rem; }
+    .hero h1 em { font-style:italic; color:#7dd3fc; }
+    .hero-sub { color:rgba(255,255,255,.8); font-size:1rem; max-width:540px; margin:0 auto 1.5rem; }
+    .hero-meta { color:rgba(255,255,255,.55); font-size:.78rem; letter-spacing:.05em; }
+    .hero-meta a { color:rgba(255,255,255,.7); text-decoration:none; }
+
+    /* SECTION NAV */
+    .sec-nav { background:#fff; border-bottom:1px solid var(--border);
+      padding:.6rem 2rem; display:flex; gap:.4rem; flex-wrap:wrap;
+      position:sticky; top:64px; z-index:90; }
+    .sec-nav a { text-decoration:none; color:var(--text-mid); font-size:.78rem; font-weight:600;
+      padding:.3rem .8rem; border-radius:999px; border:1px solid var(--border); transition:all .2s;
+      display:flex; align-items:center; gap:.35rem; }
+    .sec-nav a:hover { color:var(--blue); border-color:var(--blue); background:var(--blue-light); }
+    .sec-nav .num { background:var(--blue-light); color:var(--blue); border-radius:999px;
+      font-size:.65rem; font-weight:700; padding:.1rem .4rem; }
+
+    /* SECTIONS */
+    section { max-width:900px; margin:0 auto; padding:3.5rem 2rem; border-bottom:1px solid var(--border); }
+    section:last-of-type { border-bottom:none; }
+    .sec-label { font-size:.7rem; font-weight:700; letter-spacing:.12em; text-transform:uppercase;
+      color:var(--blue); margin-bottom:.4rem; }
+    .sec-title { font-family:'Instrument Serif',serif; font-size:clamp(1.6rem,3vw,2.2rem);
+      color:var(--text-dark); line-height:1.2; margin-bottom:.5rem; }
+    .sec-title em { font-style:italic; color:var(--blue); }
+    .sec-desc { color:var(--text-mid); font-size:.9rem; margin-bottom:2rem; max-width:680px; }
+
+    /* 3-COL CARDS */
+    .cards-3 { display:grid; grid-template-columns:repeat(auto-fill,minmax(250px,1fr)); gap:1.25rem; margin-bottom:2rem; }
+    .card { background:var(--card-bg); border:1px solid var(--border); border-radius:16px;
+      padding:1.5rem; display:flex; flex-direction:column; gap:.5rem; transition:box-shadow .2s,transform .2s; }
+    .card:hover { box-shadow:0 8px 32px rgba(37,99,235,.12); transform:translateY(-2px); }
+    .card-badge { display:inline-block; font-size:.68rem; font-weight:700; letter-spacing:.08em;
+      text-transform:uppercase; padding:.2rem .6rem; border-radius:999px; align-self:flex-start; }
+    .badge-green { background:#dcfce7; color:#166534; }
+    .badge-orange { background:#fef3c7; color:#92400e; }
+    .badge-blue { background:var(--blue-light); color:var(--blue); }
+    .card h3 { font-size:1.1rem; font-weight:700; color:var(--text-dark); }
+    .card-sub { font-size:.75rem; color:var(--text-mid); font-weight:500; }
+    .card p { font-size:.85rem; color:var(--text-mid); line-height:1.6; }
+    .card ul { padding-left:1.1rem; }
+    .card li { font-size:.82rem; color:var(--text-mid); margin-bottom:.2rem; }
+    .card-tag { font-size:.72rem; color:var(--blue); font-weight:600; margin-top:auto; }
+
+    /* TABLE */
+    .table-wrap { overflow-x:auto; margin-bottom:2rem; border-radius:12px; border:1px solid var(--border); }
+    table { width:100%; border-collapse:collapse; font-size:.85rem; }
+    thead tr { background:var(--blue); color:#fff; }
+    thead th { padding:.85rem 1rem; text-align:left; font-weight:600; font-size:.78rem; letter-spacing:.04em; }
+    tbody tr { border-bottom:1px solid var(--border); }
+    tbody tr:nth-child(even) { background:var(--blue-light); }
+    tbody tr:hover { background:var(--blue-mid); }
+    td { padding:.75rem 1rem; color:var(--text-dark); vertical-align:top; font-size:.83rem; }
+    .check { color:#16a34a; font-weight:700; }
+    .cross { color:#dc2626; }
+    .limited { color:var(--orange); font-weight:500; }
+
+    /* FUNDAMENTALS */
+    .fund-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(200px,1fr)); gap:1rem; margin-bottom:2rem; }
+    .fund-item { background:var(--card-bg); border:1px solid var(--border);
+      border-left:3px solid var(--blue); border-radius:0 12px 12px 0; padding:1.25rem 1.5rem; }
+    .fund-item h3 { font-size:.92rem; font-weight:700; color:var(--blue-dark); margin-bottom:.4rem; }
+    .fund-item p { font-size:.82rem; color:var(--text-mid); line-height:1.6; }
+
+    /* PROMPTING BOX */
+    .prompt-box { background:var(--card-bg); border:1px solid var(--border);
+      border-radius:14px; padding:1.75rem; margin-bottom:1.5rem; }
+    .pb-label { font-size:.7rem; font-weight:700; letter-spacing:.1em; text-transform:uppercase;
+      color:var(--blue); margin-bottom:.5rem; }
+    .prompt-box h3 { font-family:'Instrument Serif',serif; font-size:1.4rem;
+      color:var(--text-dark); margin-bottom:.75rem; }
+    .prompt-box p em { font-style:normal; font-weight:700; color:var(--blue-dark); }
+    .prompt-box p { font-size:.875rem; color:var(--text-mid); line-height:1.8; }
+    .prompt-example { background:var(--card-bg); border:1px solid var(--border);
+      border-radius:14px; padding:1.5rem; margin-bottom:1.25rem; }
+    .ex-label { font-size:.7rem; font-weight:700; letter-spacing:.1em; text-transform:uppercase;
+      color:var(--cyan); margin-bottom:.35rem; }
+    .prompt-example h3 { font-size:.95rem; font-weight:700; color:var(--text-dark); margin-bottom:.75rem; }
+
+    /* CODE BLOCK */
+    .code-block { background:var(--blue-light); border:1px solid var(--border-mid);
+      border-radius:8px; padding:.85rem 1rem; font-family:'Courier New',monospace;
+      font-size:.78rem; color:var(--text-dark); white-space:pre-wrap; line-height:1.65;
+      margin-top:.5rem; }
+    .code-block em { font-style:normal; color:var(--blue); font-weight:600; }
+
+    /* PRO TIP */
+    .pro-tip { background:linear-gradient(135deg,var(--blue-dark),var(--blue));
+      color:#fff; border-radius:10px; padding:1rem 1.25rem; font-size:.82rem;
+      margin-top:.85rem; line-height:1.6; }
+    .pro-tip strong { color:#7dd3fc; }
+
+    /* USE CASES */
+    .usecases-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(220px,1fr)); gap:1rem; margin-bottom:2rem; }
+    .uc-card { background:var(--card-bg); border:1px solid var(--border);
+      border-radius:14px; padding:1.25rem; transition:box-shadow .2s,transform .2s; }
+    .uc-card:hover { box-shadow:0 6px 24px rgba(37,99,235,.1); transform:translateY(-2px); }
+    .uc-type { font-size:.68rem; font-weight:700; letter-spacing:.1em; text-transform:uppercase;
+      color:var(--cyan); margin-bottom:.35rem; }
+    .uc-card h3 { font-size:.95rem; font-weight:700; color:var(--text-dark); margin-bottom:.4rem; }
+    .uc-card p { font-size:.8rem; color:var(--text-mid); margin-bottom:.6rem; line-height:1.6; }
+    .uc-stat { font-size:.75rem; font-weight:700; color:var(--green); }
+    .uc-tool { font-size:.72rem; background:var(--blue-light); color:var(--blue);
+      padding:.15rem .5rem; border-radius:999px; font-weight:600; }
+
+    /* HOW-TO STEPS */
+    .howto-group { background:var(--card-bg); border:1px solid var(--border);
+      border-radius:16px; padding:1.75rem; margin-bottom:1.5rem; }
+    .howto-group > h3 { font-family:'Instrument Serif',serif; font-size:1.2rem;
+      color:var(--text-dark); margin-bottom:1.25rem; padding-bottom:.75rem;
+      border-bottom:1px solid var(--border); }
+    .steps { display:flex; flex-direction:column; gap:1rem; }
+    .step { display:flex; gap:1rem; align-items:flex-start; }
+    .step-num { width:32px; height:32px; background:linear-gradient(135deg,var(--blue-dark),var(--blue));
+      color:#fff; border-radius:999px; display:flex; align-items:center; justify-content:center;
+      font-weight:700; font-size:.8rem; flex-shrink:0; margin-top:2px; }
+    .step h4 { font-size:.9rem; font-weight:700; color:var(--text-dark); margin-bottom:.2rem; }
+    .step p { font-size:.82rem; color:var(--text-mid); line-height:1.6; }
+    .step p em { font-style:normal; font-weight:600; color:var(--blue-dark); }
+
+    /* TIPS */
+    .tips-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(220px,1fr)); gap:1rem; margin-bottom:1.5rem; }
+    .tip-item { background:var(--card-bg); border:1px solid var(--border); border-radius:13px; padding:1.25rem; }
+    .tip-icon { font-size:1.5rem; margin-bottom:.6rem; }
+    .tip-item h4 { font-size:.9rem; font-weight:700; color:var(--text-dark); margin-bottom:.35rem; }
+    .tip-item p { font-size:.8rem; color:var(--text-mid); line-height:1.6; }
+
+    /* ALERT BOX */
+    .alert-box { background:linear-gradient(135deg,#1e3a8a,#1d4ed8);
+      border-radius:14px; padding:1.5rem; margin-bottom:2rem; color:#fff; }
+    .al-label { font-size:.7rem; font-weight:700; letter-spacing:.1em; text-transform:uppercase;
+      color:#7dd3fc; margin-bottom:.4rem; }
+    .alert-box h4 { font-size:1rem; font-weight:700; margin-bottom:.5rem; }
+    .alert-box p { font-size:.85rem; color:rgba(255,255,255,.8); line-height:1.7; }
+    .alert-box em { font-style:normal; font-weight:700; color:#7dd3fc; }
+
+    /* TEMPLATES */
+    .templates { display:flex; flex-direction:column; gap:1rem; margin-bottom:2rem; }
+    .tpl { background:var(--card-bg); border:1px solid var(--border); border-radius:12px; padding:1.25rem; }
+    .tpl-label { font-size:.68rem; font-weight:700; letter-spacing:.1em; text-transform:uppercase;
+      color:var(--blue); margin-bottom:.5rem; }
+
+    /* ROI STATS */
+    .roi-stats { display:flex; gap:1rem; flex-wrap:wrap; margin-bottom:2rem; }
+    .stat-box { background:linear-gradient(135deg,var(--blue-dark),var(--blue));
+      border-radius:14px; padding:1.5rem 2rem; text-align:center; flex:1; min-width:130px; }
+    .stat-num { font-family:'Instrument Serif',serif; font-size:2.2rem; color:#7dd3fc; line-height:1; }
+    .stat-label { font-size:.72rem; color:rgba(255,255,255,.75); text-transform:uppercase;
+      letter-spacing:.06em; margin-top:.3rem; line-height:1.4; }
+
+    /* LEVEL */
+    .level-group { display:flex; flex-direction:column; gap:.75rem; margin-bottom:2rem; }
+    .level-item { display:flex; align-items:flex-start; gap:1rem;
+      background:var(--card-bg); border:1px solid var(--border); border-radius:12px; padding:1.25rem; }
+    .level-tag { font-size:.68rem; font-weight:700; letter-spacing:.07em; text-transform:uppercase;
+      padding:.3rem .75rem; border-radius:999px; white-space:nowrap; flex-shrink:0; }
+    .l1 { background:var(--blue-light); color:var(--blue); }
+    .l2 { background:linear-gradient(135deg,#1d4ed8,#0369a1); color:#fff; }
+    .l3 { background:linear-gradient(135deg,#065f46,#059669); color:#fff; }
+    .level-item h4 { font-size:.9rem; font-weight:700; color:var(--text-dark); margin-bottom:.25rem; }
+    .level-item p { font-size:.82rem; color:var(--text-mid); line-height:1.6; }
+    .level-item em { font-style:normal; font-weight:600; color:var(--blue); }
+    .source-note { font-size:.75rem; color:var(--text-light); margin-top:1.5rem; font-style:italic; }
+
+    /* CTA */
+    .cta-section { background:linear-gradient(135deg,#1e3a8a 0%,#1d4ed8 50%,#0369a1 100%);
+      padding:4rem 2rem; text-align:center; }
+    .cta-inner { max-width:600px; margin:0 auto; }
+    .cta-label { font-size:.7rem; font-weight:700; letter-spacing:.12em; text-transform:uppercase;
+      color:#7dd3fc; margin-bottom:.5rem; }
+    .cta-section h2 { font-family:'Instrument Serif',serif; font-size:clamp(1.8rem,4vw,3rem);
+      color:#fff; line-height:1.15; margin-bottom:1rem; }
+    .cta-section h2 em { font-style:italic; color:#7dd3fc; }
+    .cta-section p { color:rgba(255,255,255,.75); font-size:.95rem; margin-bottom:1.75rem; }
+    .cta-btn { display:inline-block; background:#fff; color:var(--blue-dark); font-weight:700;
+      font-size:.9rem; padding:.85rem 2rem; border-radius:999px; text-decoration:none;
+      transition:opacity .2s,transform .2s; }
+    .cta-btn:hover { opacity:.9; transform:translateY(-1px); }
+
+    /* FOOTER */
+    footer { background:#0f172a; color:rgba(255,255,255,.5); text-align:center;
+      padding:2.5rem 2rem; font-size:.8rem; }
+    footer a { color:rgba(255,255,255,.7); text-decoration:none; }
+    .ft-brand { margin-bottom:.3rem; }
+    .ft-right { font-size:.72rem; color:rgba(255,255,255,.35); }
+
+    @media(max-width:640px){
+      nav,.sec-nav{padding:0 1rem;}
+      .sec-nav{gap:.3rem;}
+      section{padding:2.5rem 1rem;}
+      .hero{padding:3rem 1rem 2.5rem;}
+      .roi-stats{gap:.75rem;}
+    }
+  </style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav class="nav">
+  <span class="nav-brand">TRAC IT</span>
+  <div class="nav-links">
+    <a href="claude-it-playbook.html" class="active">Playbook</a>
+    <a href="claude-it-roadmap.html">Roadmap</a>
+    <a href="claude-it-topics.html">Topics</a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<header class="hero">
+  <div class="hero-tag">TRAC IT &nbsp;/&nbsp; Training Playbook</div>
+  <h1>Claude AI<br>for <em>IT Admin / IT Support</em></h1>
+  <p class="hero-sub">คู่มือใช้ Claude อย่างมือโปร สำหรับงาน IT ตั้งแต่ Helpdesk จนถึง Automation &amp; Scripting</p>
+  <div class="hero-meta">
+    <span><strong>Version</strong> 1.0</span>
+    <span><strong>Date</strong> March 2026</span>
+    <span><strong>By</strong> <a href="#">Attapon Pinpleumjit</a> / <a href="#">TRAC IT</a></span>
+  </div>
+</header>
+
+<!-- SECTION NAV -->
+<nav class="sec-nav">
+  <a href="#products"><span class="num">01</span> Claude 3 Products</a>
+  <a href="#fundamentals"><span class="num">02</span> Fundamentals</a>
+  <a href="#prompting"><span class="num">03</span> Prompting</a>
+  <a href="#usecases"><span class="num">04</span> IT Use Cases</a>
+  <a href="#howto"><span class="num">05</span> How-To</a>
+  <a href="#tips"><span class="num">06</span> Tips &amp; Tricks</a>
+  <a href="#roi"><span class="num">07</span> ROI &amp; Impact</a>
+</nav>
+
+<!-- 01 PRODUCTS -->
+<section id="products">
+  <p class="sec-label">01 — Products</p>
+  <h2 class="sec-title">Claude <em>3 Products</em> ที่ต้องรู้จัก</h2>
+  <p class="sec-desc">Claude มี 3 รูปแบบการใช้งาน สำหรับงาน IT แต่ละแบบเหมาะกับงานคนละประเภท เลือกให้ถูกตัว ได้ผลลัพธ์คนละระดับ</p>
+
+  <div class="cards-3">
+    <div class="card">
+      <span class="card-badge badge-green">เริ่มต้นที่นี่</span>
+      <h3>Claude.ai</h3>
+      <p class="card-sub">claude.ai — Web Chat</p>
+      <p>แชทกับ AI โดยตรงผ่านเว็บ เหมาะสำหรับ troubleshoot, ถาม-ตอบ, และเขียนเอกสาร IT รายวัน</p>
+      <ul>
+        <li>วิเคราะห์ error message &amp; log</li>
+        <li>เขียน/แก้ไขเอกสาร IT</li>
+        <li>อัพโหลดไฟล์ config, log วิเคราะห์ได้</li>
+        <li>สร้าง Projects เก็บ context ถาวร</li>
+      </ul>
+      <p class="card-tag">เหมาะกับ: Troubleshoot, Docs, Helpdesk</p>
+    </div>
+    <div class="card">
+      <span class="card-badge badge-orange">Advanced</span>
+      <h3>Claude Cowork</h3>
+      <p class="card-sub">claude.ai/cowork — AI Workspace</p>
+      <p>พื้นที่ทำงานร่วมกับ AI แบบ real-time เหมาะสร้าง dashboard, report, และ IT documentation</p>
+      <ul>
+        <li>เอกสาร, ตาราง, app ทำงานพร้อมกัน</li>
+        <li>แก้ไข real-time เหมือน Google Docs</li>
+        <li>สร้าง IT Dashboard &amp; Status Page</li>
+        <li>Publish &amp; share ผลงานให้ทีมได้เลย</li>
+      </ul>
+      <p class="card-tag">เหมาะกับ: Dashboard, Report, Documentation</p>
+    </div>
+    <div class="card">
+      <span class="card-badge badge-blue">Developer</span>
+      <h3>Claude Code</h3>
+      <p class="card-sub">Terminal CLI — Developer Tool</p>
+      <p>AI บน terminal อ่านไฟล์ เขียน script รันคำสั่ง ทำ automation — เหมาะ IT ที่ต้องการ script จริงจัง</p>
+      <ul>
+        <li>เขียน PowerShell, Bash, Python script</li>
+        <li>อ่าน/แก้ไขไฟล์ config ในเครื่องได้</li>
+        <li>Automation งานซ้ำอัตโนมัติ</li>
+        <li>สร้าง monitoring &amp; alert scripts</li>
+      </ul>
+      <p class="card-tag">เหมาะกับ: Scripting, Automation, DevOps</p>
+    </div>
+  </div>
+
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>Feature</th>
+          <th>Claude.ai</th>
+          <th>Cowork</th>
+          <th>Code</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td>วิเคราะห์ Error / Log</td><td class="check">✓</td><td class="check">✓</td><td class="check">✓</td></tr>
+        <tr><td>อัพโหลดไฟล์วิเคราะห์</td><td class="check">✓</td><td class="check">✓</td><td class="check">✓</td></tr>
+        <tr><td>สร้าง Dashboard/Report</td><td class="cross">✗</td><td class="check">✓</td><td class="cross">✗</td></tr>
+        <tr><td>เขียน Script จริง (run ได้)</td><td class="cross">✗</td><td class="cross">✗</td><td class="check">✓</td></tr>
+        <tr><td>เชื่อม API/Database</td><td class="cross">✗</td><td class="limited">จำกัด</td><td class="check">✓</td></tr>
+        <tr><td>Automation อัตโนมัติ</td><td class="cross">✗</td><td class="cross">✗</td><td class="check">✓</td></tr>
+        <tr><td>ต้อง install?</td><td class="limited">ไม่ต้อง</td><td class="limited">ไม่ต้อง</td><td class="limited">ต้อง</td></tr>
+        <tr><td>ราคา</td><td>Free / $20/mo</td><td>$20/mo (รวม)</td><td>$20/mo (รวม)</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- 02 FUNDAMENTALS -->
+<section id="fundamentals">
+  <p class="sec-label">02 — Fundamentals</p>
+  <h2 class="sec-title">พื้นฐานที่ <em>ต้องเข้าใจ</em></h2>
+  <p class="sec-desc">ก่อนใช้ Claude ทำงาน IT ได้ดี ต้องเข้าใจหลักการ 4 ข้อนี้ก่อน — คนส่วนใหญ่ข้ามขั้นนี้ไป แล้วได้ผลลัพธ์ไม่ตรงต้องการ</p>
+
+  <div class="fund-grid">
+    <div class="fund-item">
+      <h3>Context is Everything</h3>
+      <p>บอก Claude ให้ครบก่อนเสมอ: OS อะไร, version อะไร, error message ทั้งหมด, สิ่งที่ลองทำไปแล้ว — ยิ่งให้ข้อมูลมาก ยิ่งได้คำตอบที่แม่นยำกว่า</p>
+    </div>
+    <div class="fund-item">
+      <h3>Debug = Iteration</h3>
+      <p>ไม่ต้องได้คำตอบสมบูรณ์ครั้งแรก ให้คุยต่อเนื่อง แจ้ง error ที่เกิดจาก solution ก่อนหน้า แล้วให้ Claude ช่วย debug ต่อไปทีละขั้น</p>
+    </div>
+    <div class="fund-item">
+      <h3>Role = Expert Quality</h3>
+      <p>กำหนดบทบาทให้ Claude เช่น "คุณเป็น Senior SysAdmin ที่เชี่ยวชาญ Windows Server 15 ปี" จะได้คำตอบที่ลึก เฉพาะทาง และเป็นประโยชน์กว่ามาก</p>
+    </div>
+    <div class="fund-item">
+      <h3>Output Format Matters</h3>
+      <p>บอกรูปแบบที่ต้องการชัดเจน — step-by-step, script พร้อม comment, runbook, checklist, หรือ table เพื่อให้ได้ output ที่ใช้งานได้ทันที</p>
+    </div>
+  </div>
+</section>
+
+<!-- 03 PROMPTING -->
+<section id="prompting">
+  <p class="sec-label">03 — Prompting</p>
+  <h2 class="sec-title">เทคนิค <em>Prompting</em> สำหรับ IT</h2>
+  <p class="sec-desc">สูตรการพิมพ์คำสั่งที่ได้ผลลัพธ์ดี ใช้ได้กับทุกงาน IT Admin และ IT Support</p>
+
+  <div class="prompt-box">
+    <p class="pb-label">Formula</p>
+    <h3>สูตร CRAFT Prompt</h3>
+    <p>
+      <em>C</em> — Context: บอกบริบท (OS อะไร, version, environment, error message ทั้งหมด)<br>
+      <em>R</em> — Role: กำหนดบทบาท (Senior SysAdmin, Security Engineer, Network Admin)<br>
+      <em>A</em> — Action: บอกสิ่งที่ต้องการ (troubleshoot, เขียน script, สร้าง documentation)<br>
+      <em>F</em> — Format: ระบุรูปแบบ output (step-by-step, PowerShell script, runbook, checklist)<br>
+      <em>T</em> — Tone: ภาษาที่ใช้ (ภาษาไทย, English, technical, ภาษาสำหรับ end-user)
+    </p>
+  </div>
+
+  <div class="prompt-example">
+    <p class="ex-label">ตัวอย่าง: Troubleshoot DNS Issue</p>
+    <h3>Prompt ที่ดี</h3>
+    <div class="code-block">คุณเป็น Senior Network Admin ที่มีประสบการณ์ 10 ปี
+
+สถานการณ์: Windows Server 2022, DNS Role ติดตั้งอยู่
+ปัญหา: Client บางเครื่องใน subnet 192.168.10.0/24 resolve hostname ไม่ได้
+Error: "DNS request timed out" เมื่อ ping ด้วย hostname
+สิ่งที่ลองแล้ว: restart DNS service, flush DNS cache บน client
+
+ช่วย:
+1. วิเคราะห์สาเหตุที่เป็นไปได้ทั้งหมด
+2. ให้ checklist troubleshoot แบบ step-by-step
+3. ระบุ command ที่ต้องรันและผลที่คาดหวัง</div>
+    <div class="pro-tip">
+      <strong>Pro Tip:</strong> อัพโหลด log file (Event Viewer, DNS debug log) มาพร้อมกัน Claude จะวิเคราะห์ได้แม่นยำกว่าการพิมพ์อธิบายเอง ประหยัดเวลาได้มาก
+    </div>
+  </div>
+
+  <div class="prompt-example">
+    <p class="ex-label">ตัวอย่าง: เขียน Script</p>
+    <h3>Prompt สร้าง PowerShell Script</h3>
+    <div class="code-block">คุณเป็น PowerShell expert เขียน script สำหรับ Windows Server 2019
+
+สร้าง script ที่:
+- ตรวจสอบ disk space ทุก drive (threshold: ต่ำกว่า 20%)
+- ส่ง email alert ผ่าน SMTP เมื่อ disk ต่ำกว่า threshold
+- Log ผลลัพธ์ใส่ไฟล์ .txt พร้อม timestamp
+- รองรับการกำหนด <em>[server list]</em> จาก parameter
+
+ใส่ comment อธิบายทุก section และ error handling ด้วย</div>
+  </div>
+</section>
+
+<!-- 04 USE CASES -->
+<section id="usecases">
+  <p class="sec-label">04 — Use Cases</p>
+  <h2 class="sec-title">งาน IT ที่ <em>Claude ช่วยได้ทันที</em></h2>
+  <p class="sec-desc">8 use cases ที่ IT Admin และ IT Support ใช้ Claude ได้เลยวันนี้ พร้อมเครื่องมือที่แนะนำ</p>
+
+  <div class="usecases-grid">
+    <div class="uc-card">
+      <p class="uc-type">Incident Response</p>
+      <h3>Troubleshoot &amp; แก้ปัญหา</h3>
+      <p>วิเคราะห์ error message, log file, และ config ช่วยหาสาเหตุและวิธีแก้ได้รวดเร็ว ลด MTTR อย่างมีนัยสำคัญ</p>
+      <span class="uc-stat">⏱ 2 ชม. → 15 นาที</span><br>
+      <span class="uc-tool">Claude.ai + Upload</span>
+    </div>
+    <div class="uc-card">
+      <p class="uc-type">Scripting &amp; Automation</p>
+      <h3>เขียน Script &amp; Automation</h3>
+      <p>สร้าง PowerShell, Bash, Python script พร้อม error handling และ comment อธิบาย ไม่ต้องเริ่มจาก 0</p>
+      <span class="uc-stat">⏱ 4 ชม. → 30 นาที</span><br>
+      <span class="uc-tool">Claude.ai / Code</span>
+    </div>
+    <div class="uc-card">
+      <p class="uc-type">Documentation</p>
+      <h3>เขียน Runbook &amp; SOP</h3>
+      <p>สร้าง runbook, SOP, และ network documentation ที่ชัดเจน ครบถ้วน และทีมทุกคนเข้าใจได้</p>
+      <span class="uc-stat">⏱ 1 วัน → 2 ชั่วโมง</span><br>
+      <span class="uc-tool">Claude.ai / Cowork</span>
+    </div>
+    <div class="uc-card">
+      <p class="uc-type">Security &amp; Compliance</p>
+      <h3>ร่าง Security Policy</h3>
+      <p>ร่าง IT security policy, review firewall rules, เช็ค configuration กับ best practice เช่น CIS Benchmark</p>
+      <span class="uc-stat">⏱ 3 วัน → 4 ชั่วโมง</span><br>
+      <span class="uc-tool">Claude.ai</span>
+    </div>
+    <div class="uc-card">
+      <p class="uc-type">Helpdesk Support</p>
+      <h3>ตอบ Ticket &amp; สร้าง KB</h3>
+      <p>ตอบ helpdesk ticket ได้เร็วขึ้น สร้าง Knowledge Base article และ FAQ สำหรับ end-user แบบภาษาเข้าใจง่าย</p>
+      <span class="uc-stat">⏱ 30 นาที → 5 นาที</span><br>
+      <span class="uc-tool">Claude.ai</span>
+    </div>
+    <div class="uc-card">
+      <p class="uc-type">Monitoring &amp; Analysis</p>
+      <h3>วิเคราะห์ Log &amp; Alert</h3>
+      <p>อัพโหลด log ให้ Claude หา pattern, anomaly, และ root cause สร้าง alert rule และ monitoring query</p>
+      <span class="uc-stat">ค้นหา pattern จาก log หมื่น line ใน วินาที</span><br>
+      <span class="uc-tool">Claude.ai + Upload</span>
+    </div>
+    <div class="uc-card">
+      <p class="uc-type">Vendor &amp; Procurement</p>
+      <h3>เปรียบเทียบ Vendor &amp; RFP</h3>
+      <p>วิเคราะห์ vendor proposals, เปรียบเทียบ solution, ร่าง RFP, และสร้าง evaluation matrix ได้รวดเร็ว</p>
+      <span class="uc-stat">ประหยัดเวลา research 60-70%</span><br>
+      <span class="uc-tool">Claude.ai / Cowork</span>
+    </div>
+    <div class="uc-card">
+      <p class="uc-type">Training &amp; Onboarding</p>
+      <h3>สร้าง IT Training Material</h3>
+      <p>ออกแบบ onboarding checklist, สร้าง user guide, และ training material สำหรับ system ใหม่หรือ end-user</p>
+      <span class="uc-stat">Onboarding time ลด 40%</span><br>
+      <span class="uc-tool">Cowork</span>
+    </div>
+  </div>
+</section>
+
+<!-- 05 HOW-TO -->
+<section id="howto">
+  <p class="sec-label">05 — How-To</p>
+  <h2 class="sec-title">วิธีเริ่มต้น <em>Step by Step</em></h2>
+  <p class="sec-desc">ทำตาม 6 ขั้นตอนนี้ ใช้ Claude งาน IT ได้ทันทีภายใน 10 นาที</p>
+
+  <div class="howto-group">
+    <h3>A. เริ่มต้นใช้ Claude.ai สำหรับ IT</h3>
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">1</div>
+        <div>
+          <h4>สมัคร Account</h4>
+          <p>ไปที่ <em>claude.ai</em> สมัครด้วย Google หรือ email ใช้ฟรีได้เลย (มีโควต้าจำกัด) หรือ Pro $20/เดือน สำหรับงาน IT หนักๆ แนะนำ Pro</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <div>
+          <h4>สร้าง IT Projects</h4>
+          <p>กด <em>Projects</em> → สร้าง project แยกตามระบบ เช่น "Windows Server", "Network", "Helpdesk" แล้วใส่ Custom Instructions เช่น "ฉันเป็น IT Admin ดูแล Windows Server 2019, VMware, Cisco switch"</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <div>
+          <h4>อัพโหลด Knowledge Base</h4>
+          <p>ใน Project ให้อัพโหลดไฟล์พื้นฐาน: Network diagram, IP scheme, Server inventory, Policy ปัจจุบัน — Claude จะใช้เป็น context ให้คำตอบที่ตรงกับ environment จริงของคุณ</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">4</div>
+        <div>
+          <h4>แนบ Log / Error ทุกครั้ง</h4>
+          <p>เมื่อ troubleshoot ให้แนบ log file, screenshot error, หรือ config file มาพร้อมกัน Claude อ่าน PDF, text, ภาพ ได้หมด — ดีกว่าพิมพ์ copy-paste มาก</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">5</div>
+        <div>
+          <h4>ใช้สูตร CRAFT ถามครั้งแรก</h4>
+          <p>ระบุ Context (OS, version, error), Role (Senior SysAdmin), Action (troubleshoot/เขียน script), Format (step-by-step/script), Tone (ภาษาไทย) แล้วดูผลลัพธ์</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">6</div>
+        <div>
+          <h4>Save Prompt ที่ได้ผลดี</h4>
+          <p>Prompt ที่ใช้งานได้จริง copy เก็บไว้ใน Notepad หรือ Notion ใช้ซ้ำได้เลย สร้าง prompt library ของทีมประหยัดเวลาได้มาก</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="howto-group">
+    <h3>B. ใช้ Cowork สร้าง IT Dashboard</h3>
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">1</div>
+        <div>
+          <h4>เปิด Cowork</h4>
+          <p>ไปที่ <em>claude.ai/cowork</em> เปิด workspace ใหม่ — ไม่ต้อง install อะไร ทำงานได้ทันทีบนเบราว์เซอร์</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <div>
+          <h4>อัพโหลดข้อมูล IT</h4>
+          <p>Drag &amp; drop ไฟล์ Excel/CSV เช่น Server inventory, Ticket log, Incident report — Claude อ่านได้ทันที</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <div>
+          <h4>สั่ง Claude สร้าง Dashboard</h4>
+          <p>พิมพ์: "สร้าง IT Operations Dashboard จากข้อมูลนี้ แสดง ticket volume, MTTR, system uptime, top issues by category" แล้วรอดูผล</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">4</div>
+        <div>
+          <h4>Publish &amp; Share</h4>
+          <p>กด Publish ได้ link แชร์ให้ทีม หรือผู้บริหาร ดูได้ทันที ไม่ต้อง install PowerBI หรือ Grafana</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 06 TIPS -->
+<section id="tips">
+  <p class="sec-label">06 — Tips &amp; Best Practices</p>
+  <h2 class="sec-title">เคล็ดลับ <em>ใช้ให้เก่ง</em></h2>
+  <p class="sec-desc">เทคนิคที่จะทำให้คุณใช้ Claude สำหรับงาน IT ได้เหนือกว่าคนทั่วไป</p>
+
+  <div class="tips-grid">
+    <div class="tip-item">
+      <div class="tip-icon">🔒</div>
+      <h4>ห้าม Share Credential จริง</h4>
+      <p>ห้ามใส่ password, API key, private IP ของจริง ให้ใช้ placeholder เช่น [PASSWORD], [API_KEY] แทนเสมอ</p>
+    </div>
+    <div class="tip-item">
+      <div class="tip-icon">📎</div>
+      <h4>แนบ Log ทุกครั้ง</h4>
+      <p>Claude อ่าน log file, config file, screenshot error ได้หมด แนบมาดีกว่าพิมพ์อธิบาย — ได้คำตอบแม่นกว่ามาก</p>
+    </div>
+    <div class="tip-item">
+      <div class="tip-icon">🗂️</div>
+      <h4>ใช้ Projects แยกตามระบบ</h4>
+      <p>สร้าง Project แยก: "Windows Server", "Network", "Helpdesk", "Security" — Claude จำ context ให้ ไม่ต้องอธิบายซ้ำทุกครั้ง</p>
+    </div>
+    <div class="tip-item">
+      <div class="tip-icon">✅</div>
+      <h4>Test Script ก่อน Run จริงเสมอ</h4>
+      <p>Script ที่ Claude เขียนให้ ต้อง review และ test บน lab/dev environment ก่อนเสมอ อย่า run บน production โดยตรง</p>
+    </div>
+    <div class="tip-item">
+      <div class="tip-icon">🇹🇭</div>
+      <h4>พิมพ์ไทยได้เลย</h4>
+      <p>Claude เข้าใจภาษาไทยดีมาก พิมพ์ไทยล้วน ไทยปนอังกฤษ หรืออังกฤษล้วนก็ได้ ตอบ comment code เป็นไทยได้ด้วย</p>
+    </div>
+    <div class="tip-item">
+      <div class="tip-icon">🧠</div>
+      <h4>ให้ Claude อธิบาย Reasoning</h4>
+      <p>เพิ่ม "อธิบายเหตุผลด้วยว่าทำไมถึงเลือกวิธีนี้" จะได้ solution ที่เข้าใจ ปรับแต่งต่อได้ ไม่ใช่แค่ copy-paste</p>
+    </div>
+  </div>
+
+  <div class="alert-box">
+    <p class="al-label">กฎเหล็ก Security</p>
+    <h4>Anonymize ข้อมูลก่อนทุกครั้ง</h4>
+    <p>ข้อมูล sensitive ของระบบ (IP จริง, hostname จริง, credential, customer data) ให้ <em>แทนที่ด้วย placeholder</em> ก่อนส่งให้ Claude เสมอ เพื่อป้องกันการ leak ข้อมูล โดยเฉพาะถ้าบริษัทมี data compliance policy</p>
+  </div>
+
+  <h3 style="font-family:'Instrument Serif',serif; font-size:1.3rem; font-weight:400; margin-bottom:1rem;">Prompt Templates สำหรับ IT (Copy ไปใช้ได้เลย)</h3>
+  <div class="templates">
+    <div class="tpl">
+      <p class="tpl-label">Template: Analyze Error Log</p>
+      <div class="code-block">คุณเป็น Senior SysAdmin ที่เชี่ยวชาญ [Windows Server/Linux]
+วิเคราะห์ log ที่แนบมา โดย:
+1. ระบุ error หลักและ root cause ที่น่าจะเป็น
+2. เรียง priority ของปัญหาตามความรุนแรง
+3. ให้ step-by-step การแก้ไขแต่ละปัญหา
+4. ระบุ preventive measure เพื่อไม่ให้เกิดซ้ำ
+(ตอบเป็นภาษาไทย)</div>
+    </div>
+    <div class="tpl">
+      <p class="tpl-label">Template: Write PowerShell Script</p>
+      <div class="code-block">คุณเป็น PowerShell expert เขียน script สำหรับ Windows Server [version]
+Task: [อธิบายสิ่งที่ต้องการ]
+Requirements:
+- รองรับ parameter input
+- มี error handling และ try/catch
+- Log ผลลัพธ์พร้อม timestamp
+- Comment อธิบายทุก section เป็นภาษาไทย
+- ทดสอบได้บน [environment]</div>
+    </div>
+    <div class="tpl">
+      <p class="tpl-label">Template: Write KB Article</p>
+      <div class="code-block">คุณเป็น IT Support ที่เขียน Knowledge Base สำหรับ end-user ทั่วไป
+เขียน KB article เรื่อง: [หัวข้อปัญหา]
+รูปแบบ:
+- ชื่อบทความ (เข้าใจง่าย ไม่เป็น technical)
+- อาการที่พบ (bullet points)
+- สาเหตุที่พบบ่อย
+- วิธีแก้ไขด้วยตัวเอง (step-by-step พร้อมรูป placeholder)
+- เมื่อไรควรติดต่อ IT
+(ภาษาไทย ระดับ non-technical user)</div>
+    </div>
+  </div>
+</section>
+
+<!-- 07 ROI -->
+<section id="roi">
+  <p class="sec-label">07 — ROI &amp; Impact</p>
+  <h2 class="sec-title">ผลลัพธ์ที่ <em>วัดได้จริง</em></h2>
+  <p class="sec-desc">ตัวเลขจากงานวิจัยและ case studies จริง ที่ IT Teams ใช้ AI ในองค์กร</p>
+
+  <div class="roi-stats">
+    <div class="stat-box">
+      <p class="stat-num">87%</p>
+      <p class="stat-label">ลดเวลา<br>Troubleshoot</p>
+    </div>
+    <div class="stat-box">
+      <p class="stat-num">3×</p>
+      <p class="stat-label">Faster<br>Incident Response</p>
+    </div>
+    <div class="stat-box">
+      <p class="stat-num">90%</p>
+      <p class="stat-label">ลดเวลา<br>เขียน Docs</p>
+    </div>
+    <div class="stat-box">
+      <p class="stat-num">40%</p>
+      <p class="stat-label">ลด Ticket<br>Backlog</p>
+    </div>
+  </div>
+
+  <h3 style="font-family:'Instrument Serif',serif; font-size:1.3rem; font-weight:400; margin-bottom:1rem;">Time Savings ที่วัดได้</h3>
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>งาน IT</th>
+          <th>ก่อนใช้ AI</th>
+          <th>หลังใช้ AI</th>
+          <th>ประหยัด</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td>Troubleshoot ปัญหา Network/Server</td><td>2 ชั่วโมง</td><td>15 นาที</td><td class="check">87%</td></tr>
+        <tr><td>เขียน PowerShell / Bash Script</td><td>4 ชั่วโมง</td><td>30 นาที</td><td class="check">87%</td></tr>
+        <tr><td>สร้าง Runbook / SOP</td><td>1 วัน</td><td>1-2 ชั่วโมง</td><td class="check">75%+</td></tr>
+        <tr><td>ตอบ Helpdesk Ticket</td><td>30 นาที</td><td>5 นาที</td><td class="check">83%</td></tr>
+        <tr><td>เขียน Security Policy</td><td>3 วัน</td><td>3-4 ชั่วโมง</td><td class="check">87%</td></tr>
+        <tr><td>สร้าง IT Dashboard / Report</td><td>2-3 วัน</td><td>ไม่กี่นาที</td><td class="check">95%+</td></tr>
+        <tr><td>เขียน KB Article</td><td>2 ชั่วโมง</td><td>15 นาที</td><td class="check">87%</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3 style="font-family:'Instrument Serif',serif; font-size:1.3rem; font-weight:400; margin:2rem 0 1rem;">2026 Evolution: จาก Manual สู่ Agentic IT</h3>
+  <div class="level-group">
+    <div class="level-item">
+      <span class="level-tag l1">LEVEL 1</span>
+      <div>
+        <h4>Basic Prompting</h4>
+        <p>ถาม-ตอบทีละคำถาม copy solution ไปลองเอง ยังต้องทำงานหลายขั้นเอง</p>
+      </div>
+    </div>
+    <div class="level-item">
+      <span class="level-tag l2">LEVEL 2 — คุณอยู่ตรงนี้</span>
+      <div>
+        <h4>Projects + Template Library</h4>
+        <p>มี IT Knowledge Base + Prompt Templates + Cowork สร้าง dashboard, report อัตโนมัติ ประหยัดเวลาได้ 70-90%</p>
+      </div>
+    </div>
+    <div class="level-item">
+      <span class="level-tag l3">LEVEL 3 — เป้าหมาย</span>
+      <div>
+        <h4>Agentic IT Workflows</h4>
+        <p>พิมพ์ <em>/incident</em> → AI ดึง log + วิเคราะห์ + สร้าง incident report + notify team อัตโนมัติ ไม่ต้องทำเอง</p>
+      </div>
+    </div>
+  </div>
+
+  <p class="source-note">ข้อมูลจากงานวิจัย AI in IT Operations (2025-2026) รวม Gartner IT automation report, McKinsey AI productivity study, และ case studies จาก IT teams ที่ใช้ AI tools ในองค์กร</p>
+</section>
+
+<!-- CTA -->
+<div class="cta-section">
+  <div class="cta-inner">
+    <p class="cta-label">Next Step</p>
+    <h2>เริ่มใช้ Claude<br>สำหรับ <em>งาน IT วันนี้</em></h2>
+    <p>เปิด claude.ai สร้าง Project "IT Admin" ใส่ Custom Instructions บอก environment ของคุณ แล้วลองถามปัญหา IT แรกที่คุณมีอยู่ได้เลย</p>
+    <a href="https://claude.ai" target="_blank" class="cta-btn">เปิด Claude.ai →</a>
+  </div>
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <div class="ft-brand">
+    Prepared by <a href="#">Attapon Pinpleumjit</a> &nbsp;·&nbsp; March 2026
+  </div>
+  <div class="ft-right">Claude AI Playbook for IT Admin / IT Support v1.0</div>
+</footer>
+
+</body>
+</html>

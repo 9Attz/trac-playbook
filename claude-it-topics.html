@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Claude IT Topics — TRAC</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,400&family=Instrument+Serif:ital@0;1&family=Noto+Sans+Thai:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <style>
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+
+    :root{
+      --blue:#2563eb;--blue-dark:#1d4ed8;--blue-light:#eff6ff;--blue-mid:#dbeafe;
+      --cyan:#0ea5e9;--green:#059669;--orange:#f59e0b;--red:#ef4444;
+      --body-bg:#f0f5ff;--card-bg:#ffffff;
+      --text-dark:#0f172a;--text-mid:#475569;--text-light:#94a3b8;
+      --border:rgba(37,99,235,0.12);--border-mid:rgba(37,99,235,0.22);
+    }
+
+    body{font-family:'DM Sans','Noto Sans Thai',sans-serif;background:var(--body-bg);color:var(--text-dark);line-height:1.7;}
+
+    nav{background:#fff;border-bottom:1px solid var(--border);box-shadow:0 1px 12px rgba(37,99,235,.08);
+      padding:0 2rem;display:flex;align-items:center;justify-content:space-between;height:64px;position:sticky;top:0;z-index:100;}
+    .nav-brand{font-family:'Instrument Serif',serif;font-size:1.25rem;color:var(--blue-dark);}
+    .nav-links{display:flex;gap:.4rem;}
+    .nav-links a{text-decoration:none;color:var(--text-mid);font-size:.875rem;font-weight:500;
+      padding:.35rem .9rem;border-radius:999px;transition:all .2s;}
+    .nav-links a:hover{color:var(--blue);background:var(--blue-light);}
+    .nav-links a.active{background:var(--blue);color:#fff;}
+
+    .hero{background:linear-gradient(135deg,#1d4ed8 0%,#0369a1 60%,#0891b2 100%);
+      padding:4rem 2rem 3rem;text-align:center;position:relative;overflow:hidden;}
+    .hero::before{content:'';position:absolute;inset:0;
+      background-image:linear-gradient(rgba(255,255,255,.04) 1px,transparent 1px),
+        linear-gradient(90deg,rgba(255,255,255,.04) 1px,transparent 1px);
+      background-size:40px 40px;pointer-events:none;}
+    .hero-tag{display:inline-block;border:1px solid rgba(255,255,255,.35);color:rgba(255,255,255,.9);
+      font-size:.72rem;font-weight:600;letter-spacing:.12em;text-transform:uppercase;
+      padding:.3rem 1rem;border-radius:999px;margin-bottom:1.25rem;}
+    .hero h1{font-family:'Instrument Serif',serif;font-size:clamp(2rem,5vw,3.5rem);
+      color:#fff;line-height:1.1;margin-bottom:.75rem;}
+    .hero h1 em{font-style:italic;color:#7dd3fc;}
+    .hero-sub{color:rgba(255,255,255,.78);font-size:.95rem;}
+
+    /* TOPIC NAV (sub-nav) */
+    .topic-nav{background:var(--card-bg);border-bottom:1px solid var(--border);
+      padding:.65rem 2rem;display:flex;gap:.4rem;flex-wrap:wrap;position:sticky;top:64px;z-index:90;}
+    .topic-nav a{text-decoration:none;color:var(--text-mid);font-size:.8rem;font-weight:600;
+      padding:.3rem .85rem;border-radius:999px;border:1px solid var(--border);transition:all .2s;}
+    .topic-nav a:hover{color:var(--blue);border-color:var(--blue);background:var(--blue-light);}
+
+    /* MAIN WRAPPER */
+    .main{max-width:900px;margin:0 auto;padding:3rem 2rem;}
+
+    /* SECTION LABELS */
+    .sec-label{font-size:.7rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--blue);margin-bottom:.4rem;}
+    .sec-title{font-family:'Instrument Serif',serif;font-size:clamp(1.6rem,3vw,2.2rem);color:var(--text-dark);line-height:1.2;margin-bottom:.5rem;}
+    .sec-title em{font-style:italic;color:var(--blue);}
+    .sec-desc{color:var(--text-mid);font-size:.9rem;margin-bottom:2rem;}
+
+    section{padding-bottom:3.5rem;margin-bottom:.5rem;border-bottom:1px solid var(--border);}
+    section:last-of-type{border-bottom:none;}
+    section .sec-label{margin-top:2.5rem;}
+    section>.sec-label:first-child{margin-top:0;}
+
+    /* PROMPT LIBRARY */
+    .prompt-lib{display:flex;flex-direction:column;gap:1.25rem;}
+    .pl-item{background:var(--card-bg);border:1px solid var(--border);border-radius:16px;padding:1.5rem;}
+    .pl-label{font-size:.68rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;
+      color:var(--cyan);margin-bottom:.4rem;}
+    .pl-item h4{font-size:1rem;font-weight:700;color:var(--blue-dark);margin-bottom:.3rem;}
+    .pl-item>p{font-size:.85rem;color:var(--text-mid);margin-bottom:.75rem;}
+    .code-block{background:var(--blue-light);border:1px solid var(--border-mid);border-radius:10px;
+      padding:1rem 1.1rem;font-family:'Courier New',monospace;font-size:.78rem;color:var(--text-dark);
+      white-space:pre-wrap;line-height:1.7;}
+    .code-block em{font-style:normal;color:var(--blue);font-weight:600;}
+
+    /* TROUBLESHOOT STEPS */
+    .ts-steps{display:flex;flex-direction:column;gap:1rem;}
+    .ts-step{display:flex;gap:1rem;align-items:flex-start;
+      background:var(--card-bg);border:1px solid var(--border);border-radius:14px;padding:1.25rem;}
+    .ts-num{width:36px;height:36px;background:linear-gradient(135deg,var(--blue-dark),var(--blue));
+      color:#fff;border-radius:999px;display:flex;align-items:center;justify-content:center;
+      font-weight:700;font-size:.9rem;flex-shrink:0;}
+    .ts-step>div>h4{font-size:.93rem;font-weight:700;color:var(--text-dark);margin-bottom:.3rem;}
+    .ts-step>div>p{font-size:.83rem;color:var(--text-mid);line-height:1.6;}
+    .ts-step>div>p em{font-style:normal;font-weight:600;color:var(--blue-dark);}
+
+    /* SECURITY ALERT RULES */
+    .alert-rule{background:linear-gradient(135deg,#1e3a8a,#1d4ed8);
+      border-radius:12px;padding:1.25rem 1.5rem;margin-bottom:.85rem;color:#fff;}
+    .ar-label{font-size:.68rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;
+      color:#7dd3fc;margin-bottom:.3rem;}
+    .alert-rule>p{font-size:.85rem;color:rgba(255,255,255,.85);line-height:1.6;}
+    .alert-rule em{font-style:normal;font-weight:700;color:#7dd3fc;}
+
+    /* SECURITY GRID */
+    .security-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:1rem;}
+    .sec-rule{background:var(--card-bg);border:1px solid var(--border);
+      border-left:3px solid var(--blue);border-radius:0 13px 13px 0;padding:1.25rem;}
+    .sr-icon{font-size:1.5rem;margin-bottom:.5rem;}
+    .sec-rule h4{font-size:.9rem;font-weight:700;color:var(--blue-dark);margin-bottom:.35rem;}
+    .sec-rule p{font-size:.8rem;color:var(--text-mid);line-height:1.6;}
+
+    /* ADVANCED TECHNIQUES */
+    .tech-list{display:flex;flex-direction:column;gap:1rem;}
+    .tech-item{background:var(--card-bg);border:1px solid var(--border);border-radius:14px;padding:1.5rem;}
+    .t-label{font-size:.68rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;
+      color:var(--cyan);margin-bottom:.35rem;}
+    .tech-item h4{font-size:.95rem;font-weight:700;color:var(--text-dark);margin-bottom:.4rem;}
+    .tech-item p{font-size:.85rem;color:var(--text-mid);line-height:1.7;}
+    .tech-item em{font-style:normal;font-weight:600;color:var(--blue-dark);}
+
+    footer{background:#0f172a;color:rgba(255,255,255,.5);text-align:center;padding:2.5rem 2rem;font-size:.8rem;}
+    footer a{color:rgba(255,255,255,.7);text-decoration:none;}
+    .ft-brand{margin-bottom:.3rem;}
+    .ft-right{font-size:.72rem;color:rgba(255,255,255,.35);}
+
+    @media(max-width:640px){
+      nav,.topic-nav{padding:0 1rem;}
+      .main{padding:2rem 1rem;}
+      .hero{padding:3rem 1rem 2.5rem;}
+    }
+  </style>
+</head>
+<body>
+
+<nav class="nav">
+  <span class="nav-brand">TRAC IT</span>
+  <div class="nav-links">
+    <a href="claude-it-playbook.html">Playbook</a>
+    <a href="claude-it-roadmap.html">Roadmap</a>
+    <a href="claude-it-topics.html" class="active">Topics</a>
+  </div>
+</nav>
+
+<header class="hero">
+  <div class="hero-tag">TRAC IT &nbsp;/&nbsp; Deep Dive Topics</div>
+  <h1>Topics &amp; <em>Techniques</em></h1>
+  <p class="hero-sub">เจาะลึกเทคนิคสำหรับ IT Admin และ IT Support — Prompt Library, Troubleshoot Framework, Security Rules</p>
+</header>
+
+<nav class="topic-nav">
+  <a href="#prompts">IT Prompt Library</a>
+  <a href="#troubleshoot">Troubleshoot Framework</a>
+  <a href="#security">Security Rules</a>
+  <a href="#advanced">Advanced Techniques</a>
+</nav>
+
+<div class="main">
+
+  <!-- PROMPT LIBRARY -->
+  <section id="prompts">
+    <p class="sec-label">Topic 01</p>
+    <h2 class="sec-title">IT Prompt <em>Library</em></h2>
+    <p class="sec-desc">Prompt templates สำหรับงาน IT ที่ใช้บ่อยที่สุด — copy ไปปรับใช้ได้เลย</p>
+
+    <div class="prompt-lib">
+      <div class="pl-item">
+        <p class="pl-label">Prompt: Analyze Error / Log</p>
+        <h4>วิเคราะห์ Error และ Log File</h4>
+        <p>ใช้เมื่อต้องวิเคราะห์ error message หรือ log file เพื่อหา root cause</p>
+        <div class="code-block">คุณเป็น Senior SysAdmin ที่เชี่ยวชาญ <em>[Windows Server / Linux / Network]</em>
+
+วิเคราะห์ error/log ที่แนบมา โดย:
+1. ระบุ root cause ที่น่าจะเป็น (เรียงตาม probability)
+2. อธิบายสาเหตุเป็นภาษาเข้าใจง่าย
+3. ให้ step-by-step การแก้ไขพร้อม command จริง
+4. บอก preventive measure เพื่อไม่ให้เกิดซ้ำ
+5. ระบุว่า step ไหนที่ควรทำบน lab ก่อน
+
+ตอบเป็นภาษาไทย</div>
+      </div>
+
+      <div class="pl-item">
+        <p class="pl-label">Prompt: Write PowerShell Script</p>
+        <h4>เขียน PowerShell Script พร้อมใช้งาน</h4>
+        <p>ใช้เมื่อต้องการ script ที่มี error handling และ logging ครบถ้วน</p>
+        <div class="code-block">คุณเป็น PowerShell expert เขียน script สำหรับ <em>[Windows Server version]</em>
+
+Task: <em>[อธิบายสิ่งที่ต้องการทำ]</em>
+
+Requirements:
+- Parameter input: <em>[ระบุ parameters ที่ต้องการ]</em>
+- Error handling: try/catch ครบถ้วน
+- Logging: บันทึก log พร้อม timestamp ไปที่ <em>[path]</em>
+- Output: แสดงผลลัพธ์แบบ verbose/summary
+- Comment: อธิบายทุก section เป็นภาษาไทย
+- Test: ระบุวิธีทดสอบ script บน lab ก่อน deploy</div>
+      </div>
+
+      <div class="pl-item">
+        <p class="pl-label">Prompt: Write KB Article</p>
+        <h4>สร้าง Knowledge Base Article</h4>
+        <p>ใช้สร้าง KB article สำหรับ end-user แก้ปัญหาเองได้</p>
+        <div class="code-block">คุณเป็น IT Support ที่เขียน Knowledge Base สำหรับ end-user ทั่วไปของ TRAC
+
+เขียน KB article เรื่อง: <em>[หัวข้อปัญหา]</em>
+
+รูปแบบ:
+- ชื่อบทความ: เข้าใจง่าย ไม่เป็น technical
+- อาการที่พบ (bullet points)
+- สาเหตุที่พบบ่อย (ภาษาชาวบ้าน)
+- วิธีแก้ไขเองได้ (numbered steps ชัดเจน)
+- เมื่อไรควรโทรหา IT Support
+- Keywords สำหรับ search
+
+ภาษาไทย ระดับ non-technical user เข้าใจได้ทันที</div>
+      </div>
+
+      <div class="pl-item">
+        <p class="pl-label">Prompt: Draft Security Policy</p>
+        <h4>ร่าง IT Security Policy</h4>
+        <p>ใช้ร่าง policy ใหม่หรือ review policy เดิม</p>
+        <div class="code-block">คุณเป็น IT Security expert และที่ปรึกษา compliance
+
+ร่าง <em>[ชื่อ Policy]</em> สำหรับ TRAC (บริษัทให้เช่ารถ พนักงาน 500+ คน)
+
+โปรด:
+1. อ้างอิง PDPA พ.ร.บ. คุ้มครองข้อมูลส่วนบุคคล 2562
+2. สอดคล้องกับ ISO 27001 framework (ถ้าเป็นไปได้)
+3. ภาษาไทยเข้าใจง่าย ทั้งพนักงาน IT และ non-IT
+4. Format: วัตถุประสงค์, ขอบเขต, นิยาม, หลักเกณฑ์, บทลงโทษ
+5. ระบุส่วนที่ Legal/Management ต้อง review ก่อน</div>
+      </div>
+
+      <div class="pl-item">
+        <p class="pl-label">Prompt: Vendor Comparison</p>
+        <h4>เปรียบเทียบ Vendor / Solution</h4>
+        <p>ใช้สร้าง evaluation matrix สำหรับตัดสินใจเลือก solution</p>
+        <div class="code-block">คุณเป็นที่ปรึกษา IT ที่ช่วยประเมิน solution สำหรับองค์กร
+
+เปรียบเทียบ: <em>[Solution A]</em> vs <em>[Solution B]</em>
+บริบท: TRAC บริษัทให้เช่ารถ IT team 5 คน budget จำกัด
+
+สร้าง evaluation matrix ที่รวม:
+1. ราคา (TCO 3 ปี)
+2. Features ที่ต้องการ vs nice-to-have
+3. Integration กับ system ปัจจุบัน
+4. Support และ SLA
+5. Vendor stability / market position
+6. คะแนนรวมพร้อม recommendation
+
+สรุปเป็นตาราง + paragraph สำหรับนำเสนอผู้บริหาร</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- TROUBLESHOOT FRAMEWORK -->
+  <section id="troubleshoot">
+    <p class="sec-label">Topic 02</p>
+    <h2 class="sec-title">Troubleshoot <em>Framework</em></h2>
+    <p class="sec-desc">กระบวนการ troubleshoot ร่วมกับ Claude ที่ได้ผลดีที่สุด ใช้ได้กับปัญหาทุกประเภท</p>
+
+    <div class="ts-steps">
+      <div class="ts-step">
+        <div class="ts-num">1</div>
+        <div>
+          <h4>รวบรวมข้อมูลก่อนถาม</h4>
+          <p>ก่อน paste ให้ Claude: ระบุ <em>OS + version</em>, <em>error message เต็ม</em>, <em>สิ่งที่เปลี่ยนแปลงล่าสุด</em>, <em>สิ่งที่ลองทำไปแล้ว</em> — ข้อมูลครบ = คำตอบดี</p>
+        </div>
+      </div>
+      <div class="ts-step">
+        <div class="ts-num">2</div>
+        <div>
+          <h4>Paste Error + Log พร้อมกัน</h4>
+          <p>อัพโหลด log file หรือ paste error message ทั้งหมด อย่าตัดทอน Claude ต้องการ <em>full context</em> เพื่อวิเคราะห์ได้ถูกต้อง</p>
+        </div>
+      </div>
+      <div class="ts-step">
+        <div class="ts-num">3</div>
+        <div>
+          <h4>ขอ Prioritized Solutions</h4>
+          <p>บอกให้ Claude <em>เรียงลำดับวิธีแก้ตาม probability</em> และ <em>ความเร็ว</em> — เริ่มจากวิธีง่ายที่สุดก่อน ไม่ต้องลอง advanced fix ตั้งแต่ต้น</p>
+        </div>
+      </div>
+      <div class="ts-step">
+        <div class="ts-num">4</div>
+        <div>
+          <h4>ทดสอบ + Report ผล</h4>
+          <p>ลองวิธีแรก แล้วกลับมาบอก Claude ว่าผลเป็นอย่างไร — ถ้าไม่สำเร็จ <em>paste error ใหม่</em> ที่เกิดขึ้น Claude จะ debug ต่อได้ทันที</p>
+        </div>
+      </div>
+      <div class="ts-step">
+        <div class="ts-num">5</div>
+        <div>
+          <h4>Document ทันทีหลังแก้สำเร็จ</h4>
+          <p>หลังแก้ปัญหาได้ บอก Claude: <em>"สรุป root cause และ solution เป็น KB article"</em> — ใช้เวลา 2 นาที ประหยัดเวลาคราวหน้าได้มาก</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SECURITY RULES -->
+  <section id="security">
+    <p class="sec-label">Topic 03</p>
+    <h2 class="sec-title">Security <em>Rules</em> ที่ต้องรู้</h2>
+    <p class="sec-desc">กฎความปลอดภัยที่ IT ต้องปฏิบัติตามเมื่อใช้ Claude กับข้อมูลองค์กร</p>
+
+    <div class="alert-rule">
+      <p class="ar-label">กฎเหล็ก #1</p>
+      <p>ห้ามใส่ <em>password, API key, private key, token</em> จริงเด็ดขาด ใช้ placeholder เช่น <em>[PASSWORD]</em>, <em>[API_KEY]</em>, <em>[TOKEN]</em> แทนเสมอ</p>
+    </div>
+    <div class="alert-rule">
+      <p class="ar-label">กฎเหล็ก #2</p>
+      <p>ก่อนอัพโหลด log file ให้ <em>anonymize ข้อมูลที่ sensitive</em> ก่อน: IP จริง → 192.168.x.x, hostname จริง → SERVER-01, username จริง → USER-A</p>
+    </div>
+
+    <div class="security-grid" style="margin-top:1.5rem;">
+      <div class="sec-rule">
+        <div class="sr-icon">✅</div>
+        <h4>Script Verification ก่อน Run เสมอ</h4>
+        <p>ทุก script ที่ Claude เขียน ต้อง review code ก่อน รัน test บน lab environment ก่อน deploy บน production เสมอ ไม่มีข้อยกเว้น</p>
+      </div>
+      <div class="sec-rule">
+        <div class="sr-icon">📋</div>
+        <h4>Change Management บน Production</h4>
+        <p>Script หรือ config change ที่ Claude แนะนำ ถ้าจะ deploy บน production ต้องผ่าน Change Management process ของ TRAC ก่อนเสมอ</p>
+      </div>
+      <div class="sec-rule">
+        <div class="sr-icon">🔍</div>
+        <h4>Double-check Security Policy</h4>
+        <p>Policy ที่ Claude ร่างให้ ต้อง review โดย IT Manager หรือ Legal ก่อนประกาศใช้ Claude อาจไม่รู้ context เฉพาะของ TRAC</p>
+      </div>
+      <div class="sec-rule">
+        <div class="sr-icon">📊</div>
+        <h4>Data ใน Dashboard = Anonymized</h4>
+        <p>เมื่อสร้าง IT dashboard บน Cowork ข้อมูลที่ใช้ต้องไม่มี PII หรือข้อมูล confidential ของ TRAC ที่ไม่ควรเผยแพร่</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ADVANCED TECHNIQUES -->
+  <section id="advanced">
+    <p class="sec-label">Topic 04</p>
+    <h2 class="sec-title">Advanced <em>Techniques</em> สำหรับ IT</h2>
+    <p class="sec-desc">เทคนิคขั้นสูงที่จะทำให้ IT Admin ใช้ Claude ได้ในระดับที่เหนือกว่า</p>
+
+    <div class="tech-list">
+      <div class="tech-item">
+        <p class="t-label">Technique 01</p>
+        <h4>Multi-Step Script Building</h4>
+        <p>แทนที่จะขอ script ซับซ้อนในครั้งเดียว ให้แบ่งเป็นขั้น: <em>Step 1</em> ขอ pseudocode → <em>Step 2</em> ขอ script พร้อม comment → <em>Step 3</em> ขอเพิ่ม error handling → <em>Step 4</em> ขอ test cases — ได้ script ที่สมบูรณ์กว่ามาก</p>
+      </div>
+      <div class="tech-item">
+        <p class="t-label">Technique 02</p>
+        <h4>Explain Before Execute</h4>
+        <p>ก่อน run script ที่ Claude เขียน ให้ถาม: <em>"อธิบายว่า script นี้ทำอะไรทีละบรรทัด มีความเสี่ยงอะไรบ้าง และมีอะไรที่ต้อง configure ก่อน run"</em> — ช่วยให้เข้าใจและ review ได้ดีขึ้น</p>
+      </div>
+      <div class="tech-item">
+        <p class="t-label">Technique 03</p>
+        <h4>Iterative Documentation</h4>
+        <p>สร้าง Runbook ได้เร็วโดย: ทำงาน IT ตามปกติ แล้ว<em>"อธิบายสิ่งที่เพิ่งทำให้ Claude ฟัง"</em> → Claude เขียน Runbook ให้ → review และแก้ไข — ดีกว่านั่งเขียนใหม่จาก 0</p>
+      </div>
+      <div class="tech-item">
+        <p class="t-label">Technique 04</p>
+        <h4>Cross-Platform Adaptation</h4>
+        <p>ถ้าเจอ solution บน Windows ต้องการ Linux version บอก Claude: <em>"แปลง PowerShell script นี้เป็น Bash script สำหรับ Ubuntu 22.04"</em> — Claude ปรับ syntax และ command ให้ถูกต้องทันที</p>
+      </div>
+      <div class="tech-item">
+        <p class="t-label">Technique 05</p>
+        <h4>Preemptive Troubleshooting</h4>
+        <p>ก่อนจะเกิดปัญหา ให้ถาม Claude: <em>"ถ้าจะ migrate server นี้ ปัญหาอะไรที่มักเกิดขึ้น และจะ prevent ได้อย่างไร"</em> — สร้าง checklist ป้องกันล่วงหน้าได้</p>
+      </div>
+    </div>
+  </section>
+
+</div>
+
+<footer>
+  <div class="ft-brand">Prepared by <a href="#">Attapon Pinpleumjit</a> &nbsp;·&nbsp; TRAC IT &nbsp;·&nbsp; March 2026</div>
+  <div class="ft-right">Claude AI IT Topics — TRAC v1.0</div>
+</footer>
+
+</body>
+</html>

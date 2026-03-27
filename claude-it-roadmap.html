@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Claude IT Roadmap — TRAC</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,400&family=Instrument+Serif:ital@0;1&family=Noto+Sans+Thai:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <style>
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+
+    :root{
+      --blue:#2563eb;--blue-dark:#1d4ed8;--blue-light:#eff6ff;--blue-mid:#dbeafe;
+      --cyan:#0ea5e9;--green:#059669;--orange:#f59e0b;
+      --body-bg:#f0f5ff;--card-bg:#ffffff;
+      --text-dark:#0f172a;--text-mid:#475569;--text-light:#94a3b8;
+      --border:rgba(37,99,235,0.12);--border-mid:rgba(37,99,235,0.22);
+    }
+
+    body{font-family:'DM Sans','Noto Sans Thai',sans-serif;background:var(--body-bg);color:var(--text-dark);line-height:1.7;}
+
+    nav{background:#fff;border-bottom:1px solid var(--border);box-shadow:0 1px 12px rgba(37,99,235,.08);
+      padding:0 2rem;display:flex;align-items:center;justify-content:space-between;height:64px;position:sticky;top:0;z-index:100;}
+    .nav-brand{font-family:'Instrument Serif',serif;font-size:1.25rem;color:var(--blue-dark);}
+    .nav-links{display:flex;gap:.4rem;}
+    .nav-links a{text-decoration:none;color:var(--text-mid);font-size:.875rem;font-weight:500;
+      padding:.35rem .9rem;border-radius:999px;transition:all .2s;}
+    .nav-links a:hover{color:var(--blue);background:var(--blue-light);}
+    .nav-links a.active{background:var(--blue);color:#fff;}
+
+    .hero{background:linear-gradient(135deg,#1d4ed8 0%,#0369a1 60%,#0891b2 100%);
+      padding:4.5rem 2rem 3.5rem;text-align:center;position:relative;overflow:hidden;}
+    .hero::before{content:'';position:absolute;inset:0;
+      background-image:linear-gradient(rgba(255,255,255,.04) 1px,transparent 1px),
+        linear-gradient(90deg,rgba(255,255,255,.04) 1px,transparent 1px);
+      background-size:40px 40px;pointer-events:none;}
+    .hero-tag{display:inline-block;border:1px solid rgba(255,255,255,.35);color:rgba(255,255,255,.9);
+      font-size:.72rem;font-weight:600;letter-spacing:.12em;text-transform:uppercase;
+      padding:.3rem 1rem;border-radius:999px;margin-bottom:1.25rem;}
+    .hero h1{font-family:'Instrument Serif',serif;font-size:clamp(2.2rem,5vw,3.8rem);
+      color:#fff;line-height:1.1;margin-bottom:.75rem;}
+    .hero h1 em{font-style:italic;color:#7dd3fc;}
+    .hero-sub{color:rgba(255,255,255,.78);font-size:.95rem;max-width:520px;margin:0 auto 1rem;}
+    .hero-meta{color:rgba(255,255,255,.5);font-size:.78rem;letter-spacing:.05em;}
+
+    .main{max-width:860px;margin:0 auto;padding:3rem 2rem;}
+
+    .sec-label{font-size:.7rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--blue);margin-bottom:.4rem;}
+    .sec-title{font-family:'Instrument Serif',serif;font-size:clamp(1.6rem,3vw,2.1rem);color:var(--text-dark);line-height:1.2;margin-bottom:.5rem;}
+    .sec-title em{font-style:italic;color:var(--blue);}
+    .sec-desc{color:var(--text-mid);font-size:.9rem;margin-bottom:2rem;}
+
+    /* PHASES TIMELINE */
+    .phases{display:flex;flex-direction:column;gap:1.5rem;margin-bottom:3rem;}
+    .phase{display:grid;grid-template-columns:100px 1fr;gap:1.5rem;position:relative;}
+    .phase::before{content:'';position:absolute;left:49px;top:44px;bottom:-1.5rem;
+      width:2px;background:var(--border-mid);}
+    .phase:last-child::before{display:none;}
+    .phase-left{display:flex;flex-direction:column;align-items:center;padding-top:.6rem;}
+    .phase-week{font-size:.72rem;font-weight:700;color:var(--text-mid);letter-spacing:.06em;
+      text-transform:uppercase;margin-bottom:.5rem;text-align:center;}
+    .phase-dot{width:18px;height:18px;border-radius:50%;background:var(--border-mid);
+      border:3px solid #fff;box-shadow:0 0 0 2px var(--border-mid);}
+    .phase-dot.active{background:var(--blue);box-shadow:0 0 0 3px rgba(37,99,235,.2);}
+    .phase-dot.goal{background:var(--green);box-shadow:0 0 0 3px rgba(5,150,105,.2);}
+    .phase-right{background:var(--card-bg);border:1px solid var(--border);
+      border-radius:16px;padding:1.5rem;}
+    .phase-tag{display:inline-block;font-size:.68rem;font-weight:700;letter-spacing:.08em;
+      text-transform:uppercase;padding:.25rem .75rem;border-radius:999px;margin-bottom:.6rem;}
+    .tag-blue{background:var(--blue-light);color:var(--blue);}
+    .tag-teal{background:#e0f2fe;color:#0369a1;}
+    .tag-orange{background:#fef3c7;color:#92400e;}
+    .phase-right>h3{font-family:'Instrument Serif',serif;font-size:1.3rem;color:var(--text-dark);margin-bottom:.35rem;}
+    .phase-right>p{font-size:.85rem;color:var(--text-mid);margin-bottom:1.25rem;}
+
+    /* EXERCISE LIST */
+    .exercise-list{display:flex;flex-direction:column;gap:.6rem;}
+    .ex-item{display:flex;gap:.85rem;align-items:flex-start;padding:.7rem 1rem;
+      background:var(--blue-light);border:1px solid var(--border);border-radius:10px;}
+    .ex-num{background:var(--blue);color:#fff;border-radius:999px;font-size:.68rem;
+      font-weight:700;width:22px;height:22px;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;}
+    .ex-text{font-size:.83rem;color:var(--text-dark);line-height:1.5;}
+    .ex-text strong{color:var(--blue-dark);}
+
+    /* DAILY HABITS */
+    .habits-section{background:var(--card-bg);border:1px solid var(--border);
+      border-radius:16px;padding:2rem;margin-bottom:2.5rem;}
+    .habits-section>.sec-label{margin-bottom:.25rem;}
+    .habits-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:1rem;margin-top:1.25rem;}
+    .habit-card{background:linear-gradient(135deg,#1e3a8a,var(--blue));
+      border-radius:12px;padding:1.25rem;color:#fff;}
+    .habit-icon{font-size:1.6rem;margin-bottom:.6rem;}
+    .habit-card h4{font-size:.88rem;font-weight:700;color:#7dd3fc;margin-bottom:.4rem;}
+    .habit-card p{font-size:.8rem;color:rgba(255,255,255,.78);line-height:1.6;}
+
+    /* CHECKLIST */
+    .checklist-section{background:var(--card-bg);border:1px solid var(--border);
+      border-radius:16px;padding:2rem;margin-bottom:2.5rem;}
+    .checklist-section>.sec-label{margin-bottom:.25rem;}
+    .checklist{margin-top:1.25rem;}
+    .check-item{display:flex;align-items:flex-start;gap:.85rem;
+      padding:.65rem 0;border-bottom:1px solid var(--border);}
+    .check-item:last-child{border-bottom:none;}
+    .check-box{width:20px;height:20px;border:2px solid var(--border-mid);
+      border-radius:6px;flex-shrink:0;margin-top:2px;background:#fff;}
+    .check-item p{font-size:.85rem;color:var(--text-dark);line-height:1.5;}
+    .check-item strong{color:var(--blue-dark);}
+
+    /* CTA BOX */
+    .cta-box{background:linear-gradient(135deg,#1e3a8a 0%,#1d4ed8 50%,#0369a1 100%);
+      border-radius:16px;padding:2.5rem;text-align:center;margin-bottom:3rem;}
+    .cta-box .cta-label{font-size:.7rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:#7dd3fc;margin-bottom:.4rem;}
+    .cta-box h3{font-family:'Instrument Serif',serif;font-size:1.8rem;color:#fff;line-height:1.15;margin-bottom:.75rem;}
+    .cta-box h3 em{font-style:italic;color:#7dd3fc;}
+    .cta-box p{color:rgba(255,255,255,.75);font-size:.9rem;margin-bottom:1.25rem;}
+    .cta-btn{display:inline-block;background:#fff;color:var(--blue-dark);font-weight:700;
+      font-size:.88rem;padding:.75rem 1.75rem;border-radius:999px;text-decoration:none;transition:opacity .2s,transform .2s;}
+    .cta-btn:hover{opacity:.9;transform:translateY(-1px);}
+
+    footer{background:#0f172a;color:rgba(255,255,255,.5);text-align:center;padding:2.5rem 2rem;font-size:.8rem;}
+    footer a{color:rgba(255,255,255,.7);text-decoration:none;}
+    .ft-brand{margin-bottom:.3rem;}
+    .ft-right{font-size:.72rem;color:rgba(255,255,255,.35);}
+
+    @media(max-width:640px){
+      nav{padding:0 1rem;}
+      .main{padding:2rem 1rem;}
+      .hero{padding:3rem 1rem 2.5rem;}
+      .phase{grid-template-columns:60px 1fr;gap:1rem;}
+      .phase::before{left:29px;}
+      .habits-grid{grid-template-columns:1fr 1fr;}
+    }
+  </style>
+</head>
+<body>
+
+<nav class="nav">
+  <span class="nav-brand">TRAC IT</span>
+  <div class="nav-links">
+    <a href="claude-it-playbook.html">Playbook</a>
+    <a href="claude-it-roadmap.html" class="active">Roadmap</a>
+    <a href="claude-it-topics.html">Topics</a>
+  </div>
+</nav>
+
+<header class="hero">
+  <div class="hero-tag">TRAC IT &nbsp;/&nbsp; Training Roadmap</div>
+  <h1>0 → Pro ใน<br><em>8 สัปดาห์</em></h1>
+  <p class="hero-sub">แผนพัฒนาทักษะ Claude AI สำหรับ IT Admin และ IT Support — 4 phases, 20+ exercises, daily habits</p>
+  <div class="hero-meta">
+    <span><strong>Duration</strong> 8 สัปดาห์</span>
+    <span><strong>Level</strong> มือใหม่ → Pro</span>
+    <span><strong>By</strong> Attapon Pinpleumjit / TRAC IT</span>
+  </div>
+</header>
+
+<div class="main">
+  <p class="sec-label">Learning Path</p>
+  <h2 class="sec-title">4 Phases <em>สู่ IT Pro</em></h2>
+  <p class="sec-desc">แต่ละ phase ใช้เวลา 2 สัปดาห์ ทำได้วันละ 20-30 นาที เรียนรู้จากงานจริงที่ทำอยู่ทุกวัน</p>
+
+  <div class="phases">
+
+    <div class="phase">
+      <div class="phase-left">
+        <p class="phase-week">Week 1–2</p>
+        <div class="phase-dot"></div>
+      </div>
+      <div class="phase-right">
+        <span class="phase-tag tag-blue">PHASE 1 — Foundation</span>
+        <h3>เริ่มต้น &amp; ทดลอง</h3>
+        <p>เรียนรู้พื้นฐาน Claude ทดลองกับงาน IT ง่ายๆ ที่ทำอยู่ทุกวัน</p>
+        <div class="exercise-list">
+          <div class="ex-item"><span class="ex-num">01</span><p class="ex-text"><strong>สมัคร Claude.ai</strong> และทดลองถามปัญหา IT ง่ายๆ 5 ข้อที่เจอในสัปดาห์นี้จริงๆ</p></div>
+          <div class="ex-item"><span class="ex-num">02</span><p class="ex-text"><strong>สร้าง Project "TRAC IT"</strong> ใส่ Custom Instructions: OS, network environment, tools ที่ใช้ใน TRAC</p></div>
+          <div class="ex-item"><span class="ex-num">03</span><p class="ex-text"><strong>Troubleshoot แรก</strong> เอา error message จริงที่เจอวันนี้ paste ให้ Claude วิเคราะห์ วัดเวลาที่ประหยัดได้</p></div>
+          <div class="ex-item"><span class="ex-num">04</span><p class="ex-text"><strong>อัพโหลด Log File</strong> นำ log จริง (anonymized) อัพโหลด ให้ Claude สรุปปัญหาที่พบ</p></div>
+          <div class="ex-item"><span class="ex-num">05</span><p class="ex-text"><strong>เขียน KB Article แรก</strong> ใช้ Claude เขียน Knowledge Base article สำหรับปัญหาที่ตอบบ่อยที่สุด</p></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="phase">
+      <div class="phase-left">
+        <p class="phase-week">Week 3–4</p>
+        <div class="phase-dot active"></div>
+      </div>
+      <div class="phase-right">
+        <span class="phase-tag tag-teal">PHASE 2 — Skill Building</span>
+        <h3>Documentation &amp; Scripting</h3>
+        <p>ฝึกเขียนเอกสาร IT และ script พื้นฐาน สร้าง Prompt Library ของตัวเอง</p>
+        <div class="exercise-list">
+          <div class="ex-item"><span class="ex-num">06</span><p class="ex-text"><strong>เขียน Runbook แรก</strong> ใช้ Claude ร่าง Runbook กระบวนการ IT 1 อย่างที่ทำบ่อยที่สุด</p></div>
+          <div class="ex-item"><span class="ex-num">07</span><p class="ex-text"><strong>สร้าง PowerShell Script</strong> ขอให้ Claude เขียน script ตรวจ disk space และส่ง email alert</p></div>
+          <div class="ex-item"><span class="ex-num">08</span><p class="ex-text"><strong>Test Script บน Lab</strong> รัน script ที่ Claude เขียนบน test environment บันทึกผลและปรับแก้</p></div>
+          <div class="ex-item"><span class="ex-num">09</span><p class="ex-text"><strong>ตอบ Helpdesk Ticket</strong> ใช้ Claude draft คำตอบ ticket 10 ใบในสัปดาห์นี้ วัดเวลาก่อน-หลัง</p></div>
+          <div class="ex-item"><span class="ex-num">10</span><p class="ex-text"><strong>สร้าง IT Prompt Library</strong> รวม prompt IT ที่ใช้งานได้จริงอย่างน้อย 10 prompts</p></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="phase">
+      <div class="phase-left">
+        <p class="phase-week">Week 5–6</p>
+        <div class="phase-dot"></div>
+      </div>
+      <div class="phase-right">
+        <span class="phase-tag tag-teal">PHASE 3 — Advanced</span>
+        <h3>Security, Policy &amp; Dashboard</h3>
+        <p>ก้าวสู่งาน IT ขั้นสูง: security policy, log analysis, และ IT dashboard</p>
+        <div class="exercise-list">
+          <div class="ex-item"><span class="ex-num">11</span><p class="ex-text"><strong>ร่าง IT Security Policy</strong> ใช้ Claude ร่าง Password Policy หรือ Access Control Policy สำหรับ TRAC</p></div>
+          <div class="ex-item"><span class="ex-num">12</span><p class="ex-text"><strong>วิเคราะห์ Log อัตโนมัติ</strong> อัพโหลด Event Viewer log (anonymized) ให้ Claude หา top 5 issues</p></div>
+          <div class="ex-item"><span class="ex-num">13</span><p class="ex-text"><strong>สร้าง IT Dashboard</strong> ใช้ Cowork สร้าง dashboard แสดง ticket volume, MTTR, system uptime</p></div>
+          <div class="ex-item"><span class="ex-num">14</span><p class="ex-text"><strong>เปรียบเทียบ Vendor</strong> ใช้ Claude เปรียบเทียบ 2 solutions ที่กำลังพิจารณาอยู่ สร้าง evaluation matrix</p></div>
+          <div class="ex-item"><span class="ex-num">15</span><p class="ex-text"><strong>เขียน Script ซับซ้อน</strong> สร้าง automation script ที่ทำงานหลายขั้นตอน เช่น user provisioning</p></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="phase">
+      <div class="phase-left">
+        <p class="phase-week">Week 7–8</p>
+        <div class="phase-dot goal"></div>
+      </div>
+      <div class="phase-right">
+        <span class="phase-tag tag-orange">PHASE 4 — Pro Level</span>
+        <h3>Automation &amp; Knowledge Sharing</h3>
+        <p>สร้าง IT workflow อัตโนมัติและแชร์ความรู้ให้ทีม TRAC IT</p>
+        <div class="exercise-list">
+          <div class="ex-item"><span class="ex-num">16</span><p class="ex-text"><strong>สร้าง IT SOP ครบชุด</strong> เขียน SOP 3 กระบวนการที่สำคัญที่สุดใน TRAC IT ด้วย Claude</p></div>
+          <div class="ex-item"><span class="ex-num">17</span><p class="ex-text"><strong>สร้าง IT Onboarding Kit</strong> ออกแบบ onboarding checklist และ guide สำหรับพนักงานใหม่ที่ต้องใช้ IT</p></div>
+          <div class="ex-item"><span class="ex-num">18</span><p class="ex-text"><strong>สร้าง IT Monthly Report</strong> ใช้ Claude สร้าง IT operations report สำหรับผู้บริหาร</p></div>
+          <div class="ex-item"><span class="ex-num">19</span><p class="ex-text"><strong>Teach the Team</strong> สอนเพื่อนร่วมทีม IT 1 คน ใช้เวลา 30 นาที ให้เขาลอง troubleshoot ด้วย Claude</p></div>
+          <div class="ex-item"><span class="ex-num">20</span><p class="ex-text"><strong>Measure &amp; Document Impact</strong> รวบรวมตัวเลขเวลาที่ประหยัดได้ใน 8 สัปดาห์ สร้าง ROI report</p></div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="habits-section">
+    <p class="sec-label">Daily Habits</p>
+    <h2 class="sec-title">นิสัย <em>IT Pro</em> ที่ต้องสร้าง</h2>
+    <p class="sec-desc">ทำสิ่งเหล่านี้ทุกวัน สร้าง muscle memory ในการใช้ Claude กับงาน IT</p>
+    <div class="habits-grid">
+      <div class="habit-card">
+        <div class="habit-icon">🖥️</div>
+        <h4>เช้า — Check Alerts (5 นาที)</h4>
+        <p>นำ alert/error ที่ค้างอยู่มาถาม Claude ก่อนเริ่มวัน วางแผนการ troubleshoot</p>
+      </div>
+      <div class="habit-card">
+        <div class="habit-icon">⚡</div>
+        <h4>ระหว่างวัน — Paste First (ทันที)</h4>
+        <p>เมื่อเจอ error ใดๆ paste ให้ Claude ก่อนเสมอ แม้จะรู้วิธีแก้แล้ว เพื่อฝึกนิสัย</p>
+      </div>
+      <div class="habit-card">
+        <div class="habit-icon">💾</div>
+        <h4>หลังแก้ปัญหา — Document It (3 นาที)</h4>
+        <p>ให้ Claude เขียน KB article ทุกครั้งที่แก้ปัญหาสำเร็จ สะสม knowledge base</p>
+      </div>
+      <div class="habit-card">
+        <div class="habit-icon">📊</div>
+        <h4>ทุกศุกร์ — Time Tracking (10 นาที)</h4>
+        <p>บันทึกว่าสัปดาห์นี้ใช้ Claude แก้ปัญหาอะไร ประหยัดเวลาได้กี่ชั่วโมง</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="checklist-section">
+    <p class="sec-label">Week 1 Checklist</p>
+    <h2 class="sec-title">เริ่มต้น <em>7 วันแรก</em></h2>
+    <p class="sec-desc">ทำให้ครบในสัปดาห์แรก สร้าง foundation ที่แข็งแกร่งสำหรับ 7 สัปดาห์ต่อไป</p>
+    <div class="checklist">
+      <div class="check-item"><div class="check-box"></div><p><strong>วันที่ 1:</strong> สมัคร claude.ai เอา error message จริงจากวันนี้ถาม Claude ดูผลลัพธ์</p></div>
+      <div class="check-item"><div class="check-box"></div><p><strong>วันที่ 2:</strong> สร้าง Project "TRAC IT" ใส่ environment ของคุณ: OS, network, tools</p></div>
+      <div class="check-item"><div class="check-box"></div><p><strong>วันที่ 3:</strong> อัพโหลด log file จริง (anonymized) ให้ Claude วิเคราะห์</p></div>
+      <div class="check-item"><div class="check-box"></div><p><strong>วันที่ 4:</strong> ขอให้ Claude เขียน PowerShell/Bash script งานเล็กๆ 1 อย่าง</p></div>
+      <div class="check-item"><div class="check-box"></div><p><strong>วันที่ 5:</strong> เขียน KB article ด้วย Claude สำหรับปัญหาที่ตอบบ่อยที่สุด</p></div>
+      <div class="check-item"><div class="check-box"></div><p><strong>วันที่ 6:</strong> บันทึก prompt ที่ได้ผลดี 3 prompts ลง Prompt Library</p></div>
+      <div class="check-item"><div class="check-box"></div><p><strong>วันที่ 7:</strong> แชร์ให้เพื่อนทีม IT 1 คน ลองใช้ Claude troubleshoot ด้วยกัน</p></div>
+    </div>
+  </div>
+
+  <div class="cta-box">
+    <p class="cta-label">Ready?</p>
+    <h3>เริ่ม Phase 1 <em>วันนี้เลย</em></h3>
+    <p>เปิด claude.ai → เอา error ที่เจอวันนี้ paste เลย ใช้เวลาแค่ 5 นาที</p>
+    <a href="claude-it-playbook.html" class="cta-btn">กลับไปอ่าน Playbook →</a>
+  </div>
+</div>
+
+<footer>
+  <div class="ft-brand">Prepared by <a href="#">Attapon Pinpleumjit</a> &nbsp;·&nbsp; TRAC IT &nbsp;·&nbsp; March 2026</div>
+  <div class="ft-right">Claude AI IT Roadmap — TRAC v1.0</div>
+</footer>
+
+</body>
+</html>
