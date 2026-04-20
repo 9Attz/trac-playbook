@@ -1,0 +1,995 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TRAC Business Flow — RB / CB / OP</title>
+<link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #F4F6FB;
+    --surface: #FFFFFF;
+    --surface2: #EEF2F9;
+    --border: #D8DEF0;
+    --text: #1E2235;
+    --muted: #7B85A3;
+
+    --rb: #0284C7;   --rb-dim: #E0F2FE; --rb-glow: rgba(2,132,199,.15);
+    --cb: #059669;   --cb-dim: #D1FAE5; --cb-glow: rgba(5,150,105,.15);
+    --op: #D97706;   --op-dim: #FEF3C7; --op-glow: rgba(217,119,6,.15);
+    --zoho: #4F46E5; --zoho-dim: #EEF2FF;
+
+    --step-w: 168px;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Sarabun','Segoe UI',sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
+
+  /* ── Header ── */
+  header {
+    padding: 28px 48px 24px;
+    background: #fff;
+    border-bottom: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 16px;
+    box-shadow: 0 1px 6px rgba(0,0,0,.05);
+  }
+  .header-title { display: flex; align-items: center; gap: 14px; }
+  .header-logo {
+    width: 44px; height: 44px; background: #2563EB; border-radius: 10px;
+    display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+  }
+  header h1 { font-size: 22px; font-weight: 800; color: #1E2235; }
+  header p  { font-size: 13px; color: var(--muted); margin-top: 2px; }
+
+  /* BU tabs */
+  .tabs { display: flex; gap: 8px; }
+  .tab {
+    padding: 8px 22px; border-radius: 50px; font-size: 13px; font-weight: 700;
+    cursor: pointer; border: 2px solid var(--border); transition: all .22s; color: var(--muted);
+    background: var(--surface);
+  }
+  .tab:hover { color: var(--text); border-color: #AAB4CC; background: var(--surface2); }
+  .tab.active-rb { background: var(--rb-dim); color: var(--rb); border-color: var(--rb); }
+  .tab.active-cb { background: var(--cb-dim); color: var(--cb); border-color: var(--cb); }
+  .tab.active-op { background: var(--op-dim); color: var(--op); border-color: var(--op); }
+
+  /* ── Panels ── */
+  .panel { display: none; padding: 36px 48px 60px; }
+  .panel.show { display: block; }
+
+  /* Section label */
+  .flow-label {
+    display: flex; align-items: center; gap: 12px; margin-bottom: 32px;
+  }
+  .flow-label-dot { width: 12px; height: 12px; border-radius: 50%; flex-shrink: 0; }
+  .flow-label h2 { font-size: 18px; font-weight: 800; }
+  .flow-label span { font-size: 13px; color: var(--muted); margin-left: 6px; }
+
+  /* ── Flow lane ── */
+  .lane-wrap { position: relative; margin-bottom: 48px; }
+  .lane {
+    display: flex; align-items: flex-start; gap: 0;
+    overflow-x: auto; padding-bottom: 10px;
+  }
+  .lane::-webkit-scrollbar { height: 5px; }
+  .lane::-webkit-scrollbar-track { background: var(--surface2); border-radius: 4px; }
+  .lane::-webkit-scrollbar-thumb { background: #C5CCE0; border-radius: 4px; }
+
+  /* Step card */
+  .step-wrap { display: flex; align-items: flex-start; flex-shrink: 0; }
+  .step {
+    width: var(--step-w); border-radius: 12px; padding: 16px 14px;
+    border: 1.5px solid var(--border); background: var(--surface);
+    position: relative; transition: all .22s; cursor: default;
+    flex-shrink: 0; box-shadow: 0 1px 4px rgba(0,0,0,.06);
+  }
+  .step:hover { transform: translateY(-3px); box-shadow: 0 6px 20px rgba(0,0,0,.1); }
+
+  .step-num {
+    width: 22px; height: 22px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 11px; font-weight: 700; color: #fff; margin-bottom: 10px; flex-shrink: 0;
+  }
+  .step-icon { font-size: 22px; margin-bottom: 8px; }
+  .step-title { font-size: 13px; font-weight: 700; color: var(--text); margin-bottom: 4px; line-height: 1.35; }
+  .step-who { font-size: 10.5px; color: var(--muted); margin-bottom: 8px; }
+  .step-tables { display: flex; flex-direction: column; gap: 3px; }
+  .tbl-tag {
+    display: inline-block; font-size: 10px; font-weight: 600;
+    padding: 2px 7px; border-radius: 5px; background: var(--zoho-dim);
+    color: var(--zoho); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    max-width: 100%;
+  }
+
+  /* Arrow connector */
+  .arrow {
+    display: flex; align-items: center; padding: 0 5px;
+    color: #C5CCE0; font-size: 22px; flex-shrink: 0; margin-top: 28px;
+    user-select: none;
+  }
+
+  /* Color variants */
+  .s-rb { border-top: 3px solid var(--rb); }
+  .s-rb:hover { border-color: var(--rb); box-shadow: 0 6px 20px var(--rb-glow); }
+  .s-rb .step-num { background: var(--rb); }
+  .s-rb .step-title { color: var(--rb); }
+  .arrow-rb { color: #BAE0F5; }
+
+  .s-cb { border-top: 3px solid var(--cb); }
+  .s-cb:hover { border-color: var(--cb); box-shadow: 0 6px 20px var(--cb-glow); }
+  .s-cb .step-num { background: var(--cb); }
+  .s-cb .step-title { color: var(--cb); }
+  .arrow-cb { color: #A7F0D4; }
+
+  .s-op { border-top: 3px solid var(--op); }
+  .s-op:hover { border-color: var(--op); box-shadow: 0 6px 20px var(--op-glow); }
+  .s-op .step-num { background: var(--op); }
+  .s-op .step-title { color: var(--op); }
+  .arrow-op { color: #FCD9A0; }
+
+  /* ── Phase divider ── */
+  .phase-row { display: flex; gap: 16px; margin-bottom: 14px; flex-wrap: wrap; }
+  .phase-badge {
+    font-size: 11px; font-weight: 700; padding: 5px 16px; border-radius: 50px;
+    letter-spacing: .4px; border: 1px solid;
+  }
+  .phase-rb { background: var(--rb-dim); color: var(--rb); border-color: #BAE0F5; }
+  .phase-cb { background: var(--cb-dim); color: var(--cb); border-color: #A7F0D4; }
+  .phase-op { background: var(--op-dim); color: var(--op); border-color: #FCD9A0; }
+
+  /* ── Legend ── */
+  .legend {
+    display: flex; gap: 20px; flex-wrap: wrap; align-items: center;
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 12px; padding: 14px 20px; margin-bottom: 36px;
+    font-size: 12.5px;
+  }
+  .legend-item { display: flex; align-items: center; gap: 8px; color: var(--muted); }
+  .legend-dot { width: 10px; height: 10px; border-radius: 3px; flex-shrink: 0; }
+
+  /* ── Summary table ── */
+  .summary {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 14px; overflow: hidden; margin-top: 40px;
+    box-shadow: 0 1px 6px rgba(0,0,0,.05);
+  }
+  .summary-header {
+    padding: 14px 22px; border-bottom: 1px solid var(--border);
+    font-size: 12px; font-weight: 700; color: var(--muted);
+    text-transform: uppercase; letter-spacing: .8px; background: var(--surface2);
+  }
+  .summary table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  .summary th { padding: 10px 16px; text-align: left; color: var(--muted); font-size: 11px; font-weight: 700; text-transform: uppercase; border-bottom: 1px solid var(--border); background: #FAFBFF; }
+  .summary td { padding: 10px 16px; border-bottom: 1px solid var(--border); vertical-align: top; line-height: 1.6; color: var(--text); }
+  .summary tr:last-child td { border-bottom: none; }
+  .summary tr:hover td { background: var(--surface2); }
+
+  /* Footer */
+  footer { text-align: center; padding: 24px; color: var(--muted); font-size: 12px; border-top: 1px solid var(--border); background: #fff; }
+</style>
+</head>
+<body>
+
+<!-- ── Header ── -->
+<header>
+  <div class="header-title">
+    <div class="header-logo">
+      <svg width="22" height="22" viewBox="0 0 20 20" fill="none">
+        <path d="M3 4h14v2.5L8.5 14H17v2H3v-2.5L11.5 6H3V4z" fill="white"/>
+      </svg>
+    </div>
+    <div>
+      <h1>TRAC Business Flow</h1>
+      <p>Journey ตั้งแต่เริ่มจนจบ — RB · CB · OP &nbsp;|&nbsp; TRACSaaS_PROD</p>
+    </div>
+  </div>
+  <div class="tabs">
+    <div class="tab active-rb" onclick="show('rb',this)">🛒 RB — Retail</div>
+    <div class="tab" onclick="show('cb',this)">🏢 CB — Corporate</div>
+    <div class="tab" onclick="show('op',this)">⚙️ OP — Operations</div>
+  </div>
+</header>
+
+<!-- ════════════════════════ RB PANEL ════════════════════════ -->
+<div id="panel-rb" class="panel show">
+
+  <div class="flow-label">
+    <div class="flow-label-dot" style="background:var(--rb)"></div>
+    <h2 style="color:var(--rb)">Retail Business — เช่ารถระยะสั้น</h2>
+    <span>รายวัน / รายสัปดาห์ / รายเดือน</span>
+  </div>
+
+  <div class="legend">
+    <span style="font-size:12px;font-weight:700;color:#fff;margin-right:4px">Zoho Tables:</span>
+    <div class="legend-item"><div class="legend-dot" style="background:#6366F1"></div>แสดง Zoho Analytics Table ที่เกี่ยวข้องในแต่ละ Step</div>
+    <div class="legend-item">💡 Hover ที่ Card เพื่อดูรายละเอียด</div>
+  </div>
+
+  <!-- Phase 1: Pre-Rental -->
+  <div class="phase-row"><span class="phase-badge phase-rb">📋 Phase 1 — Pre-Rental (ก่อนเช่า)</span></div>
+  <div class="lane-wrap">
+    <div class="lane">
+
+      <div class="step-wrap">
+        <div class="step s-rb">
+          <div class="step-num">1</div>
+          <div class="step-icon">📞</div>
+          <div class="step-title">รับ Booking</div>
+          <div class="step-who">👤 Call Center / Walk-in / Online</div>
+          <div class="step-tables">
+            <span class="tbl-tag">All_Reservation_Details</span>
+            <span class="tbl-tag">EHI Reservation Details</span>
+          </div>
+        </div>
+        <div class="arrow arrow-rb">›</div>
+      </div>
+
+      <div class="step-wrap">
+        <div class="step s-rb">
+          <div class="step-num">2</div>
+          <div class="step-icon">🚗</div>
+          <div class="step-title">ตรวจ Fleet ว่าง</div>
+          <div class="step-who">🔧 ฝ่าย Fleet / Branch</div>
+          <div class="step-tables">
+            <span class="tbl-tag">Daily Fleet Inventory</span>
+            <span class="tbl-tag">CAR_STATUS</span>
+            <span class="tbl-tag">Fleet_Inventory</span>
+          </div>
+        </div>
+        <div class="arrow arrow-rb">›</div>
+      </div>
+
+      <div class="step-wrap">
+        <div class="step s-rb">
+          <div class="step-num">3</div>
+          <div class="step-icon">💰</div>
+          <div class="step-title">เสนอราคา</div>
+          <div class="step-who">💼 Sales / Front Desk</div>
+          <div class="step-tables">
+            <span class="tbl-tag">Sale Code Rental</span>
+            <span class="tbl-tag">A Sale Code Leasing</span>
+          </div>
+        </div>
+        <div class="arrow arrow-rb">›</div>
+      </div>
+
+      <div class="step-wrap">
+        <div class="step s-rb">
+          <div class="step-num">4</div>
+          <div class="step-icon">✅</div>
+          <div class="step-title">ยืนยัน Booking</div>
+          <div class="step-who">👤 ลูกค้า + Front Desk</div>
+          <div class="step-tables">
+            <span class="tbl-tag">EHI Agreement Reservation</span>
+            <span class="tbl-tag">Driver Profile</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Phase 2: Rental -->
+  <div class="phase-row"><span class="phase-badge phase-rb">🚘 Phase 2 — During Rental (ระหว่างเช่า)</span></div>
+  <div class="lane-wrap">
+    <div class="lane">
+
+      <div class="step-wrap">
+        <div class="step s-rb">
+          <div class="step-num">5</div>
+          <div class="step-icon">🔑</div>
+          <div class="step-title">Check-out / รับรถ</div>
+          <div class="step-who">🔧 Branch Staff</div>
+          <div class="step-tables">
+            <span class="tbl-tag">Agreement Check Out</span>
+            <span class="tbl-tag">Agreement_Rental</span>
+            <span class="tbl-tag">Passportid License Expiry</span>
+          </div>
+        </div>
+        <div class="arrow arrow-rb">›</div>
+      </div>
+
+      <div class="step-wrap">
+        <div class="step s-rb">
+          <div class="step-num">6</div>
+          <div class="step-icon">📍</div>
+          <div class="step-title">ติดตามระหว่างใช้</div>
+          <div class="step-who">🔧 Fleet / Branch</div>
+          <div class="step-tables">
+            <span class="tbl-tag">Traffic Transactions</span>
+            <span class="tbl-tag">Fleet Utilization EHI</span>
+          </div>
+        </div>
+        <div class="arrow arrow-rb">›</div>
+      </div>
+
+      <div class="step-wrap">
+        <div class="step s-rb">
+          <div class="step-num">7</div>
+          <div class="step-icon">🔄</div>
+          <div class="step-title">Return / คืนรถ</div>
+          <div class="step-who">🔧 Branch Staff</div>
+          <div class="step-tables">
+            <span class="tbl-tag">Agreement Rental NCR</span>
+            <span class="tbl-tag">RB-Agreement Check Out</span>
+          </div>
+        </div>
+        <div class="arrow arrow-rb">›</div>
+      </div>
+
+      <div class="step-wrap">
+        <div class="step s-rb">
+          <div class="step-num">8</div>
+          <div class="step-icon">🔍</div>
+          <div class="step-title">ตรวจความเสียหาย</div>
+          <div class="step-who">🔧 Branch / Damage Inspector</div>
+          <div class="step-tables">
+            <span class="tbl-tag">Damage Analysis</span>
+            <span class="tbl-tag">Adjustment Invoice Log</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Phase 3: Post-Rental -->
+  <div class="phase-row"><span class="phase-badge phase-rb">💳 Phase 3 — Post-Rental (หลังคืนรถ)</span></div>
+  <div class="lane-wrap">
+    <div class="lane">
+
+      <div class="step-wrap">
+        <div class="step s-rb">
+          <div class="step-num">9</div>
+          <div class="step-icon">🧾</div>
+          <div class="step-title">ออก Invoice</div>
+          <div class="step-who">💼 Finance / Billing</div>
+          <div class="step-tables">
+            <span class="tbl-tag">A Invoice Receipt</span>
+            <span class="tbl-tag">Invoice_Analysis</span>
+            <span class="tbl-tag">A Agent Invoice</span>
+          </div>
+        </div>
+        <div class="arrow arrow-rb">›</div>
+      </div>
+
+      <div class="step-wrap">
+        <div class="step s-rb">
+          <div class="step-num">10</div>
+          <div class="step-icon">💵</div>
+          <div class="step-title">เก็บเงิน</div>
+          <div class="step-who">💼 Finance / Collection</div>
+          <div class="step-tables">
+            <span class="tbl-tag">A Collection</span>
+            <span class="tbl-tag">A Aging By Due Date</span>
+            <span class="tbl-tag">Account Collection</span>
+          </div>
+        </div>
+        <div class="arrow arrow-rb">›</div>
+      </div>
+
+      <div class="step-wrap">
+        <div class="step s-rb">
+          <div class="step-num">11</div>
+          <div class="step-icon">🧮</div>
+          <div class="step-title">Tax / ภาษี</div>
+          <div class="step-who">💼 Accounting</div>
+          <div class="step-tables">
+            <span class="tbl-tag">A Sale TAX (Yearly)</span>
+            <span class="tbl-tag">T Sales Tax Report</span>
+            <span class="tbl-tag">T WHT Deduct Report</span>
+          </div>
+        </div>
+        <div class="arrow arrow-rb">›</div>
+      </div>
+
+      <div class="step-wrap">
+        <div class="step s-rb">
+          <div class="step-num">12</div>
+          <div class="step-icon">🔄</div>
+          <div class="step-title">รถกลับ Fleet</div>
+          <div class="step-who">🔧 Operations</div>
+          <div class="step-tables">
+            <span class="tbl-tag">Fleet_Inventory</span>
+            <span class="tbl-tag">CAR_STATUS</span>
+            <span class="tbl-tag">Daily Fleet Inventory</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Summary -->
+  <div class="summary">
+    <div class="summary-header">📊 Zoho Analytics ที่ใช้ตลอด Journey — RB</div>
+    <table>
+      <thead><tr><th>Phase</th><th>Report / Table หลัก</th><th>วัตถุประสงค์</th></tr></thead>
+      <tbody>
+        <tr><td><span style="color:var(--rb)">Pre-Rental</span></td><td>All_Reservation_Details, CAR_STATUS</td><td>ตรวจ Fleet ว่างก่อนยืนยัน Booking</td></tr>
+        <tr><td><span style="color:var(--rb)">Check-out</span></td><td>Agreement Check Out, Driver Profile</td><td>ตรวจสอบข้อมูลลูกค้า สัญญาเช่า</td></tr>
+        <tr><td><span style="color:var(--rb)">During Rental</span></td><td>Fleet Utilization EHI, Fleetlisting</td><td>Monitor Utilization รายวัน</td></tr>
+        <tr><td><span style="color:var(--rb)">Post-Rental</span></td><td>A Invoice Receipt, A Collection, A Aging</td><td>ออก Invoice และติดตามการชำระ</td></tr>
+        <tr><td><span style="color:var(--rb)">Finance</span></td><td>A Sale TAX, T WHT Deduct Report</td><td>รายงานภาษีประจำเดือน/ปี</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- ════════════════════════ CB PANEL ════════════════════════ -->
+<div id="panel-cb" class="panel">
+
+  <div class="flow-label">
+    <div class="flow-label-dot" style="background:var(--cb)"></div>
+    <h2 style="color:var(--cb)">Corporate Business — เช่าระยะยาว / Leasing</h2>
+    <span>สัญญา 1–5 ปี · HP Loan · Fleet Management</span>
+  </div>
+
+  <div class="legend">
+    <span style="font-size:12px;font-weight:700;color:#fff;margin-right:4px">Zoho Tables:</span>
+    <div class="legend-item"><div class="legend-dot" style="background:#6366F1"></div>แสดง Zoho Analytics Table ที่เกี่ยวข้องในแต่ละ Step</div>
+  </div>
+
+  <!-- Phase 1: Sales -->
+  <div class="phase-row"><span class="phase-badge phase-cb">🎯 Phase 1 — Sales & Quotation</span></div>
+  <div class="lane-wrap"><div class="lane">
+
+    <div class="step-wrap">
+      <div class="step s-cb">
+        <div class="step-num">1</div>
+        <div class="step-icon">🎯</div>
+        <div class="step-title">หา Lead / Prospect</div>
+        <div class="step-who">💼 Sales Team</div>
+        <div class="step-tables">
+          <span class="tbl-tag">CRM_Lead</span>
+          <span class="tbl-tag">CRM_Prospect</span>
+          <span class="tbl-tag">CRM_Contact</span>
+        </div>
+      </div>
+      <div class="arrow arrow-cb">›</div>
+    </div>
+
+    <div class="step-wrap">
+      <div class="step s-cb">
+        <div class="step-num">2</div>
+        <div class="step-icon">🔎</div>
+        <div class="step-title">Survey ความต้องการ</div>
+        <div class="step-who">💼 Sales / Account Manager</div>
+        <div class="step-tables">
+          <span class="tbl-tag">CRM_Deal</span>
+          <span class="tbl-tag">CRM_Event</span>
+          <span class="tbl-tag">Data Sale Team</span>
+        </div>
+      </div>
+      <div class="arrow arrow-cb">›</div>
+    </div>
+
+    <div class="step-wrap">
+      <div class="step s-cb">
+        <div class="step-num">3</div>
+        <div class="step-icon">📄</div>
+        <div class="step-title">ออก Quotation</div>
+        <div class="step-who">💼 Sales + Finance</div>
+        <div class="step-tables">
+          <span class="tbl-tag">Lease Quotation</span>
+          <span class="tbl-tag">Debitor Credit Limits</span>
+        </div>
+      </div>
+      <div class="arrow arrow-cb">›</div>
+    </div>
+
+    <div class="step-wrap">
+      <div class="step s-cb">
+        <div class="step-num">4</div>
+        <div class="step-icon">✍️</div>
+        <div class="step-title">เจรจา + อนุมัติ</div>
+        <div class="step-who">💼 Sales + Management</div>
+        <div class="step-tables">
+          <span class="tbl-tag">CRM_Campaign</span>
+          <span class="tbl-tag">Debitor Credit Limits</span>
+        </div>
+      </div>
+    </div>
+
+  </div></div>
+
+  <!-- Phase 2: Contract -->
+  <div class="phase-row"><span class="phase-badge phase-cb">📑 Phase 2 — Contract & Delivery</span></div>
+  <div class="lane-wrap"><div class="lane">
+
+    <div class="step-wrap">
+      <div class="step s-cb">
+        <div class="step-num">5</div>
+        <div class="step-icon">📝</div>
+        <div class="step-title">เซ็นสัญญา Lease</div>
+        <div class="step-who">💼 Legal + Finance</div>
+        <div class="step-tables">
+          <span class="tbl-tag">Lease Agreement Report</span>
+          <span class="tbl-tag">Lease_Agreements_List</span>
+        </div>
+      </div>
+      <div class="arrow arrow-cb">›</div>
+    </div>
+
+    <div class="step-wrap">
+      <div class="step s-cb">
+        <div class="step-num">6</div>
+        <div class="step-icon">🛒</div>
+        <div class="step-title">จัดหารถ / PO</div>
+        <div class="step-who">🔧 Procurement / Fleet</div>
+        <div class="step-tables">
+          <span class="tbl-tag">Fleet_Purchase</span>
+          <span class="tbl-tag">A Vechicle PO (Daily)</span>
+          <span class="tbl-tag">Purchase Order</span>
+          <span class="tbl-tag">Purchase Request</span>
+        </div>
+      </div>
+      <div class="arrow arrow-cb">›</div>
+    </div>
+
+    <div class="step-wrap">
+      <div class="step s-cb">
+        <div class="step-num">7</div>
+        <div class="step-icon">🔑</div>
+        <div class="step-title">ส่งมอบรถ</div>
+        <div class="step-who">🔧 Fleet Delivery Team</div>
+        <div class="step-tables">
+          <span class="tbl-tag">Agreement Check Out</span>
+          <span class="tbl-tag">Vechicle Information</span>
+          <span class="tbl-tag">Driver Profile</span>
+        </div>
+      </div>
+      <div class="arrow arrow-cb">›</div>
+    </div>
+
+    <div class="step-wrap">
+      <div class="step s-cb">
+        <div class="step-num">8</div>
+        <div class="step-icon">🏦</div>
+        <div class="step-title">เริ่ม HP Loan</div>
+        <div class="step-who">💼 Finance</div>
+        <div class="step-tables">
+          <span class="tbl-tag">A HP Loan Detail</span>
+          <span class="tbl-tag">A HP Loan Total</span>
+        </div>
+      </div>
+    </div>
+
+  </div></div>
+
+  <!-- Phase 3: During Contract -->
+  <div class="phase-row"><span class="phase-badge phase-cb">📅 Phase 3 — During Contract (ระหว่างสัญญา)</span></div>
+  <div class="lane-wrap"><div class="lane">
+
+    <div class="step-wrap">
+      <div class="step s-cb">
+        <div class="step-num">9</div>
+        <div class="step-icon">🧾</div>
+        <div class="step-title">Invoice รายเดือน</div>
+        <div class="step-who">💼 Finance / Billing</div>
+        <div class="step-tables">
+          <span class="tbl-tag">Lease Invoice List</span>
+          <span class="tbl-tag">A Sale Code Leasing</span>
+          <span class="tbl-tag">Invoice_Analysis</span>
+        </div>
+      </div>
+      <div class="arrow arrow-cb">›</div>
+    </div>
+
+    <div class="step-wrap">
+      <div class="step s-cb">
+        <div class="step-num">10</div>
+        <div class="step-icon">💵</div>
+        <div class="step-title">เก็บเงิน / Aging</div>
+        <div class="step-who">💼 Collection Team</div>
+        <div class="step-tables">
+          <span class="tbl-tag">A Collection</span>
+          <span class="tbl-tag">Account Collection Ageing</span>
+          <span class="tbl-tag">Unbilled AGT</span>
+        </div>
+      </div>
+      <div class="arrow arrow-cb">›</div>
+    </div>
+
+    <div class="step-wrap">
+      <div class="step s-cb">
+        <div class="step-num">11</div>
+        <div class="step-icon">🔧</div>
+        <div class="step-title">Maintenance ระหว่างสัญญา</div>
+        <div class="step-who">🔧 Operations / Workshop</div>
+        <div class="step-tables">
+          <span class="tbl-tag">Work Order</span>
+          <span class="tbl-tag">Lease Service Vehicles</span>
+          <span class="tbl-tag">Lease Temporary Vehicles</span>
+        </div>
+      </div>
+      <div class="arrow arrow-cb">›</div>
+    </div>
+
+    <div class="step-wrap">
+      <div class="step s-cb">
+        <div class="step-num">12</div>
+        <div class="step-icon">📈</div>
+        <div class="step-title">Monitor Revenue</div>
+        <div class="step-who">💼 Finance + Management</div>
+        <div class="step-tables">
+          <span class="tbl-tag">Lease Projected Revenue</span>
+          <span class="tbl-tag">Lease Exchanges(1)</span>
+        </div>
+      </div>
+    </div>
+
+  </div></div>
+
+  <!-- Phase 4: End of Contract -->
+  <div class="phase-row"><span class="phase-badge phase-cb">🏁 Phase 4 — End of Contract</span></div>
+  <div class="lane-wrap"><div class="lane">
+
+    <div class="step-wrap">
+      <div class="step s-cb">
+        <div class="step-num">13</div>
+        <div class="step-icon">⏰</div>
+        <div class="step-title">แจ้งเตือนใกล้หมด</div>
+        <div class="step-who">💼 Account Manager</div>
+        <div class="step-tables">
+          <span class="tbl-tag">Lease Agreement Report</span>
+          <span class="tbl-tag">Lease Projected Revenue</span>
+        </div>
+      </div>
+      <div class="arrow arrow-cb">›</div>
+    </div>
+
+    <div class="step-wrap">
+      <div class="step s-cb">
+        <div class="step-num">14</div>
+        <div class="step-icon">🔄</div>
+        <div class="step-title">ต่อสัญญา / คืนรถ</div>
+        <div class="step-who">💼 Sales + Legal</div>
+        <div class="step-tables">
+          <span class="tbl-tag">Lease_Agreements_List</span>
+          <span class="tbl-tag">Agreement Rental NCR</span>
+        </div>
+      </div>
+      <div class="arrow arrow-cb">›</div>
+    </div>
+
+    <div class="step-wrap">
+      <div class="step s-cb">
+        <div class="step-num">15</div>
+        <div class="step-icon">🧮</div>
+        <div class="step-title">ชำระส่วนต่าง / ปิดบัญชี</div>
+        <div class="step-who">💼 Finance</div>
+        <div class="step-tables">
+          <span class="tbl-tag">Refunds</span>
+          <span class="tbl-tag">Account Transactions</span>
+          <span class="tbl-tag">A Common Receipt</span>
+        </div>
+      </div>
+      <div class="arrow arrow-cb">›</div>
+    </div>
+
+    <div class="step-wrap">
+      <div class="step s-cb">
+        <div class="step-num">16</div>
+        <div class="step-icon">📊</div>
+        <div class="step-title">Tax / รายงานปิดปี</div>
+        <div class="step-who">💼 Accounting</div>
+        <div class="step-tables">
+          <span class="tbl-tag">A Sale TAX (Yearly)</span>
+          <span class="tbl-tag">Sales Tax Report 2025</span>
+        </div>
+      </div>
+    </div>
+
+  </div></div>
+
+  <div class="summary">
+    <div class="summary-header">📊 Zoho Analytics ที่ใช้ตลอด Journey — CB</div>
+    <table>
+      <thead><tr><th>Phase</th><th>Report / Table หลัก</th><th>วัตถุประสงค์</th></tr></thead>
+      <tbody>
+        <tr><td><span style="color:var(--cb)">Sales</span></td><td>CRM_Lead, CRM_Deal, Lease Quotation</td><td>ติดตาม Pipeline และเสนอราคา</td></tr>
+        <tr><td><span style="color:var(--cb)">Contract</span></td><td>Lease Agreement Report, Fleet_Purchase</td><td>จัดการสัญญาและจัดหารถ</td></tr>
+        <tr><td><span style="color:var(--cb)">During</span></td><td>Lease Invoice List, A HP Loan Detail, A Collection</td><td>Invoice รายเดือน + ติดตามชำระ</td></tr>
+        <tr><td><span style="color:var(--cb)">End</span></td><td>Lease Projected Revenue, Refunds</td><td>วางแผนต่อสัญญา + ปิดบัญชี</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- ════════════════════════ OP PANEL ════════════════════════ -->
+<div id="panel-op" class="panel">
+
+  <div class="flow-label">
+    <div class="flow-label-dot" style="background:var(--op)"></div>
+    <h2 style="color:var(--op)">Operations — Fleet Management ตลอดอายุรถ</h2>
+    <span>จัดซื้อ → ลงทะเบียน → บำรุงรักษา → ขายทิ้ง</span>
+  </div>
+
+  <div class="legend">
+    <span style="font-size:12px;font-weight:700;color:#fff;margin-right:4px">Zoho Tables:</span>
+    <div class="legend-item"><div class="legend-dot" style="background:#6366F1"></div>แสดง Zoho Analytics Table ที่เกี่ยวข้องในแต่ละ Step</div>
+  </div>
+
+  <!-- Phase 1: Acquisition -->
+  <div class="phase-row"><span class="phase-badge phase-op">🛒 Phase 1 — Fleet Acquisition (จัดหารถ)</span></div>
+  <div class="lane-wrap"><div class="lane">
+
+    <div class="step-wrap">
+      <div class="step s-op">
+        <div class="step-num">1</div>
+        <div class="step-icon">📋</div>
+        <div class="step-title">วางแผนจัดซื้อ</div>
+        <div class="step-who">🔧 Fleet Planning</div>
+        <div class="step-tables">
+          <span class="tbl-tag">Fleet Utilization EHI</span>
+          <span class="tbl-tag">Data Size Car</span>
+          <span class="tbl-tag">Rental_Util_Car_Group</span>
+        </div>
+      </div>
+      <div class="arrow arrow-op">›</div>
+    </div>
+
+    <div class="step-wrap">
+      <div class="step s-op">
+        <div class="step-num">2</div>
+        <div class="step-icon">📝</div>
+        <div class="step-title">Purchase Request / PO</div>
+        <div class="step-who">🔧 Procurement</div>
+        <div class="step-tables">
+          <span class="tbl-tag">Purchase Request</span>
+          <span class="tbl-tag">Purchase Order</span>
+          <span class="tbl-tag">A Vechicle PO (Daily)</span>
+        </div>
+      </div>
+      <div class="arrow arrow-op">›</div>
+    </div>
+
+    <div class="step-wrap">
+      <div class="step s-op">
+        <div class="step-num">3</div>
+        <div class="step-icon">🚗</div>
+        <div class="step-title">รับรถเข้า Fleet</div>
+        <div class="step-who">🔧 Fleet Admin</div>
+        <div class="step-tables">
+          <span class="tbl-tag">Fleet_Purchase</span>
+          <span class="tbl-tag">Vechicle Information</span>
+          <span class="tbl-tag">Fleet_List_Cherry</span>
+        </div>
+      </div>
+      <div class="arrow arrow-op">›</div>
+    </div>
+
+    <div class="step-wrap">
+      <div class="step s-op">
+        <div class="step-num">4</div>
+        <div class="step-icon">📋</div>
+        <div class="step-title">ทำทะเบียน + ประกัน</div>
+        <div class="step-who">🔧 Fleet Admin / Legal</div>
+        <div class="step-tables">
+          <span class="tbl-tag">Fleet Registration Renewal</span>
+          <span class="tbl-tag">Fleet Insurance Renewal</span>
+          <span class="tbl-tag">Fleet License Renewal</span>
+        </div>
+      </div>
+    </div>
+
+  </div></div>
+
+  <!-- Phase 2: Active Fleet -->
+  <div class="phase-row"><span class="phase-badge phase-op">🚘 Phase 2 — Active Fleet Management</span></div>
+  <div class="lane-wrap"><div class="lane">
+
+    <div class="step-wrap">
+      <div class="step s-op">
+        <div class="step-num">5</div>
+        <div class="step-icon">🗺️</div>
+        <div class="step-title">กระจายรถไปสาขา</div>
+        <div class="step-who">🔧 Fleet Distribution</div>
+        <div class="step-tables">
+          <span class="tbl-tag">Non Revenue Transfers</span>
+          <span class="tbl-tag">Fleetlisting</span>
+          <span class="tbl-tag">Rental_Util_Branch</span>
+        </div>
+      </div>
+      <div class="arrow arrow-op">›</div>
+    </div>
+
+    <div class="step-wrap">
+      <div class="step s-op">
+        <div class="step-num">6</div>
+        <div class="step-icon">📊</div>
+        <div class="step-title">Monitor สถานะรถ</div>
+        <div class="step-who">🔧 Fleet Control</div>
+        <div class="step-tables">
+          <span class="tbl-tag">CAR_STATUS</span>
+          <span class="tbl-tag">Daily Fleet Inventory (All)</span>
+          <span class="tbl-tag">Fleet Inventory All</span>
+        </div>
+      </div>
+      <div class="arrow arrow-op">›</div>
+    </div>
+
+    <div class="step-wrap">
+      <div class="step s-op">
+        <div class="step-num">7</div>
+        <div class="step-icon">⏰</div>
+        <div class="step-title">ติดตาม Renewal</div>
+        <div class="step-who">🔧 Fleet Admin</div>
+        <div class="step-tables">
+          <span class="tbl-tag">Fleet Insurance Renewal</span>
+          <span class="tbl-tag">Fleet License Renewal</span>
+          <span class="tbl-tag">Fleet Registration Renewal</span>
+        </div>
+      </div>
+      <div class="arrow arrow-op">›</div>
+    </div>
+
+    <div class="step-wrap">
+      <div class="step s-op">
+        <div class="step-num">8</div>
+        <div class="step-icon">📈</div>
+        <div class="step-title">วิเคราะห์ Utilization</div>
+        <div class="step-who">📊 Fleet Analyst</div>
+        <div class="step-tables">
+          <span class="tbl-tag">Fleet Utilization EHI</span>
+          <span class="tbl-tag">Rental_Util_Company</span>
+          <span class="tbl-tag">EHI Data Mapping</span>
+        </div>
+      </div>
+    </div>
+
+  </div></div>
+
+  <!-- Phase 3: Maintenance -->
+  <div class="phase-row"><span class="phase-badge phase-op">🔧 Phase 3 — Maintenance & Repair</span></div>
+  <div class="lane-wrap"><div class="lane">
+
+    <div class="step-wrap">
+      <div class="step s-op">
+        <div class="step-num">9</div>
+        <div class="step-icon">⚠️</div>
+        <div class="step-title">แจ้งซ่อม / เปิด WO</div>
+        <div class="step-who">🔧 Branch / Driver</div>
+        <div class="step-tables">
+          <span class="tbl-tag">Work Order</span>
+          <span class="tbl-tag">Work Order T</span>
+        </div>
+      </div>
+      <div class="arrow arrow-op">›</div>
+    </div>
+
+    <div class="step-wrap">
+      <div class="step s-op">
+        <div class="step-num">10</div>
+        <div class="step-icon">🏭</div>
+        <div class="step-title">ส่งอู่ / ซ่อม</div>
+        <div class="step-who">🔧 Workshop / Vendor</div>
+        <div class="step-tables">
+          <span class="tbl-tag">Work Order Fix Item Details</span>
+          <span class="tbl-tag">Service Analysis</span>
+          <span class="tbl-tag">Maintenance Analysis</span>
+        </div>
+      </div>
+      <div class="arrow arrow-op">›</div>
+    </div>
+
+    <div class="step-wrap">
+      <div class="step s-op">
+        <div class="step-num">11</div>
+        <div class="step-icon">✅</div>
+        <div class="step-title">ปิด WO / QC</div>
+        <div class="step-who">🔧 Fleet / QC</div>
+        <div class="step-tables">
+          <span class="tbl-tag">Work Order Invoices</span>
+          <span class="tbl-tag">Work Order Invoice</span>
+        </div>
+      </div>
+      <div class="arrow arrow-op">›</div>
+    </div>
+
+    <div class="step-wrap">
+      <div class="step s-op">
+        <div class="step-num">12</div>
+        <div class="step-icon">🧾</div>
+        <div class="step-title">ชำระค่าซ่อม</div>
+        <div class="step-who">💼 Finance / AP</div>
+        <div class="step-tables">
+          <span class="tbl-tag">Adjustment Invoice Log</span>
+          <span class="tbl-tag">Account Transactions</span>
+        </div>
+      </div>
+    </div>
+
+  </div></div>
+
+  <!-- Phase 4: Disposal -->
+  <div class="phase-row"><span class="phase-badge phase-op">♻️ Phase 4 — Fleet Disposal (จำหน่ายรถ)</span></div>
+  <div class="lane-wrap"><div class="lane">
+
+    <div class="step-wrap">
+      <div class="step s-op">
+        <div class="step-num">13</div>
+        <div class="step-icon">📊</div>
+        <div class="step-title">ประเมินรถที่ควรขาย</div>
+        <div class="step-who">🔧 Fleet Planning</div>
+        <div class="step-tables">
+          <span class="tbl-tag">Maintenance Analysis</span>
+          <span class="tbl-tag">Damage Analysis</span>
+          <span class="tbl-tag">Vechicle Information</span>
+        </div>
+      </div>
+      <div class="arrow arrow-op">›</div>
+    </div>
+
+    <div class="step-wrap">
+      <div class="step s-op">
+        <div class="step-num">14</div>
+        <div class="step-icon">💰</div>
+        <div class="step-title">ตั้งราคา / ประมูล</div>
+        <div class="step-who">💼 Sales / Fleet</div>
+        <div class="step-tables">
+          <span class="tbl-tag">Car Sell</span>
+          <span class="tbl-tag">Fleet Sales</span>
+        </div>
+      </div>
+      <div class="arrow arrow-op">›</div>
+    </div>
+
+    <div class="step-wrap">
+      <div class="step s-op">
+        <div class="step-num">15</div>
+        <div class="step-icon">📝</div>
+        <div class="step-title">โอนกรรมสิทธิ์</div>
+        <div class="step-who">🔧 Legal / Fleet Admin</div>
+        <div class="step-tables">
+          <span class="tbl-tag">Fleet Sales</span>
+          <span class="tbl-tag">Vechicle Information</span>
+        </div>
+      </div>
+      <div class="arrow arrow-op">›</div>
+    </div>
+
+    <div class="step-wrap">
+      <div class="step s-op">
+        <div class="step-num">16</div>
+        <div class="step-icon">🔄</div>
+        <div class="step-title">อัปเดต Fleet Status</div>
+        <div class="step-who">🔧 Fleet Admin</div>
+        <div class="step-tables">
+          <span class="tbl-tag">Fleet_Inventory</span>
+          <span class="tbl-tag">CAR_STATUS</span>
+          <span class="tbl-tag">Fleetlisting</span>
+        </div>
+      </div>
+    </div>
+
+  </div></div>
+
+  <div class="summary">
+    <div class="summary-header">📊 Zoho Analytics ที่ใช้ตลอด Journey — OP</div>
+    <table>
+      <thead><tr><th>Phase</th><th>Report / Table หลัก</th><th>วัตถุประสงค์</th></tr></thead>
+      <tbody>
+        <tr><td><span style="color:var(--op)">Acquisition</span></td><td>Purchase Order, Fleet_Purchase, Fleet Registration</td><td>จัดซื้อและลงทะเบียนรถใหม่</td></tr>
+        <tr><td><span style="color:var(--op)">Active Fleet</span></td><td>CAR_STATUS, Fleetlisting, Utilization</td><td>Monitor สถานะ Fleet รายวัน</td></tr>
+        <tr><td><span style="color:var(--op)">Maintenance</span></td><td>Work Order, Maintenance Analysis, Service Analysis</td><td>ติดตาม WO และค่าซ่อม</td></tr>
+        <tr><td><span style="color:var(--op)">Disposal</span></td><td>Car Sell, Fleet Sales</td><td>จำหน่ายรถเก่าออกจาก Fleet</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<footer>
+  TRAC Business Flow Diagram &nbsp;|&nbsp; TRACSaaS_PROD &nbsp;|&nbsp; IT-TRAC &nbsp;|&nbsp; เมษายน 2569
+</footer>
+
+<script>
+  function show(bu, el) {
+    document.querySelectorAll('.panel').forEach(p => p.classList.remove('show'));
+    document.querySelectorAll('.tab').forEach(t => t.className = 'tab');
+    document.getElementById('panel-' + bu).classList.add('show');
+    el.classList.add('active-' + bu);
+  }
+</script>
+</body>
+</html>
