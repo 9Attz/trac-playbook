@@ -1,0 +1,797 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Zoho Analytics Playbook — TRACSaaS_PROD</title>
+<style>
+  :root {
+    --primary: #1565C0;
+    --primary-dark: #0D47A1;
+    --primary-light: #E3F2FD;
+    --accent: #F57C00;
+    --accent-light: #FFF3E0;
+    --success: #2E7D32;
+    --success-light: #E8F5E9;
+    --text: #212121;
+    --text-muted: #757575;
+    --border: #E0E0E0;
+    --bg: #F5F7FA;
+    --sidebar-w: 270px;
+    --white: #ffffff;
+    --tip-bg: #E8F4FD;
+    --warn-bg: #FFF8E1;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Sarabun', 'Segoe UI', sans-serif; background: var(--bg); color: var(--text); display: flex; min-height: 100vh; }
+
+  /* ─── Sidebar ─── */
+  #sidebar {
+    width: var(--sidebar-w); min-height: 100vh; background: var(--primary-dark);
+    position: fixed; top: 0; left: 0; overflow-y: auto; z-index: 100;
+    display: flex; flex-direction: column;
+  }
+  .sidebar-logo {
+    padding: 20px 20px 16px; border-bottom: 1px solid rgba(255,255,255,.15);
+  }
+  .sidebar-logo h1 { color: #fff; font-size: 15px; font-weight: 700; line-height: 1.3; }
+  .sidebar-logo span { color: rgba(255,255,255,.6); font-size: 12px; }
+
+  .sidebar-section { padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,.08); }
+  .sidebar-section-title {
+    color: rgba(255,255,255,.45); font-size: 10px; font-weight: 700;
+    letter-spacing: 1.2px; text-transform: uppercase; padding: 6px 20px 4px;
+  }
+  .sidebar-link {
+    display: flex; align-items: center; gap: 9px;
+    color: rgba(255,255,255,.75); text-decoration: none; font-size: 13px;
+    padding: 7px 20px; transition: all .2s; border-left: 3px solid transparent;
+  }
+  .sidebar-link:hover { background: rgba(255,255,255,.08); color: #fff; border-left-color: rgba(255,255,255,.3); }
+  .sidebar-link.active { background: rgba(255,255,255,.12); color: #fff; border-left-color: #F57C00; font-weight: 600; }
+  .sidebar-link .icon { font-size: 15px; width: 18px; text-align: center; }
+
+  /* ─── Main content ─── */
+  #main { margin-left: var(--sidebar-w); flex: 1; padding: 32px 40px 80px; max-width: calc(100% - var(--sidebar-w)); }
+
+  /* ─── Top banner ─── */
+  .hero {
+    background: linear-gradient(135deg, var(--primary-dark) 0%, #1565C0 50%, #1976D2 100%);
+    border-radius: 14px; padding: 40px 44px; margin-bottom: 36px; color: #fff;
+    display: flex; align-items: center; justify-content: space-between; gap: 20px;
+  }
+  .hero h2 { font-size: 26px; font-weight: 700; margin-bottom: 8px; }
+  .hero p { opacity: .85; font-size: 14px; line-height: 1.7; max-width: 520px; }
+  .hero-badge {
+    background: rgba(255,255,255,.15); border: 1px solid rgba(255,255,255,.25);
+    border-radius: 50px; padding: 6px 18px; font-size: 12px; font-weight: 600;
+    white-space: nowrap;
+  }
+
+  /* ─── Role pills ─── */
+  .role-pills { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 32px; }
+  .role-pill {
+    padding: 8px 20px; border-radius: 50px; font-size: 13px; font-weight: 600;
+    cursor: pointer; border: 2px solid transparent; transition: all .2s;
+    text-decoration: none;
+  }
+  .pill-all   { background: var(--primary); color: #fff; }
+  .pill-user  { background: var(--success-light); color: var(--success); border-color: var(--success); }
+  .pill-admin { background: var(--accent-light); color: var(--accent); border-color: var(--accent); }
+  .pill-analyst { background: #EDE7F6; color: #6A1B9A; border-color: #7B1FA2; }
+
+  /* ─── Sections ─── */
+  .section { margin-bottom: 52px; scroll-margin-top: 24px; }
+  .section-header {
+    display: flex; align-items: center; gap: 12px;
+    border-bottom: 3px solid var(--primary); padding-bottom: 12px; margin-bottom: 24px;
+  }
+  .section-icon { font-size: 26px; }
+  .section-header h3 { font-size: 20px; font-weight: 700; color: var(--primary-dark); }
+  .section-header .badge {
+    font-size: 11px; padding: 3px 10px; border-radius: 50px; font-weight: 700; margin-left: 6px;
+  }
+  .badge-user     { background: var(--success-light); color: var(--success); }
+  .badge-admin    { background: var(--accent-light); color: var(--accent); }
+  .badge-analyst  { background: #EDE7F6; color: #6A1B9A; }
+  .badge-all      { background: var(--primary-light); color: var(--primary); }
+
+  /* ─── Cards ─── */
+  .cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 18px; margin-bottom: 24px; }
+  .card {
+    background: var(--white); border-radius: 12px; padding: 22px;
+    border: 1px solid var(--border); box-shadow: 0 2px 8px rgba(0,0,0,.05);
+    transition: box-shadow .2s;
+  }
+  .card:hover { box-shadow: 0 4px 16px rgba(21,101,192,.12); }
+  .card-icon { font-size: 28px; margin-bottom: 12px; }
+  .card h4 { font-size: 14px; font-weight: 700; color: var(--primary-dark); margin-bottom: 6px; }
+  .card p { font-size: 13px; color: var(--text-muted); line-height: 1.65; }
+
+  /* ─── Steps ─── */
+  .steps { counter-reset: step; display: flex; flex-direction: column; gap: 14px; }
+  .step {
+    counter-increment: step;
+    background: var(--white); border: 1px solid var(--border); border-radius: 10px;
+    padding: 16px 18px 16px 60px; position: relative; font-size: 13.5px; line-height: 1.7;
+  }
+  .step::before {
+    content: counter(step);
+    position: absolute; left: 16px; top: 14px;
+    width: 28px; height: 28px; border-radius: 50%;
+    background: var(--primary); color: #fff;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 12px; font-weight: 700;
+  }
+  .step strong { color: var(--primary-dark); }
+  .step code { background: #F3F4F6; padding: 1px 7px; border-radius: 4px; font-family: monospace; font-size: 12px; color: #C62828; }
+
+  /* ─── Tip / Warning boxes ─── */
+  .tip, .warn, .note {
+    border-radius: 10px; padding: 14px 18px; margin: 16px 0; font-size: 13.5px; line-height: 1.7;
+    display: flex; gap: 12px; align-items: flex-start;
+  }
+  .tip  { background: var(--tip-bg);  border-left: 4px solid var(--primary); }
+  .warn { background: var(--warn-bg); border-left: 4px solid #F57C00; }
+  .note { background: var(--success-light); border-left: 4px solid var(--success); }
+  .tip-icon { font-size: 18px; flex-shrink: 0; margin-top: 1px; }
+
+  /* ─── Table ─── */
+  .tbl-wrap { overflow-x: auto; margin: 16px 0; border-radius: 10px; border: 1px solid var(--border); }
+  table { width: 100%; border-collapse: collapse; font-size: 13.5px; background: var(--white); }
+  th { background: var(--primary); color: #fff; padding: 11px 14px; text-align: left; font-size: 12.5px; }
+  td { padding: 10px 14px; border-bottom: 1px solid #F0F0F0; vertical-align: top; line-height: 1.6; }
+  tr:last-child td { border-bottom: none; }
+  tr:hover td { background: var(--primary-light); }
+
+  /* ─── Menu item snapshots ─── */
+  .menu-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 12px; margin: 18px 0; }
+  .menu-item {
+    background: var(--white); border: 1px solid var(--border); border-radius: 10px;
+    padding: 16px; text-align: center; transition: all .2s;
+  }
+  .menu-item:hover { border-color: var(--primary); box-shadow: 0 2px 12px rgba(21,101,192,.1); }
+  .menu-item .mi-icon { font-size: 28px; margin-bottom: 8px; }
+  .menu-item .mi-name { font-size: 13px; font-weight: 700; color: var(--primary-dark); margin-bottom: 4px; }
+  .menu-item .mi-desc { font-size: 11.5px; color: var(--text-muted); line-height: 1.5; }
+
+  /* ─── Divider ─── */
+  hr { border: none; border-top: 1px solid var(--border); margin: 32px 0; }
+
+  /* ─── TOC ─── */
+  .toc { background: var(--white); border: 1px solid var(--border); border-radius: 12px; padding: 20px 24px; margin-bottom: 32px; }
+  .toc h4 { font-size: 13px; font-weight: 700; color: var(--text-muted); margin-bottom: 12px; text-transform: uppercase; letter-spacing: .8px; }
+  .toc-list { columns: 2; gap: 24px; list-style: none; }
+  .toc-list li { margin-bottom: 7px; break-inside: avoid; }
+  .toc-list a { color: var(--primary); text-decoration: none; font-size: 13px; }
+  .toc-list a:hover { text-decoration: underline; }
+
+  /* ─── Breadcrumb subtitle ─── */
+  .subtitle { font-size: 13px; color: var(--text-muted); margin-bottom: 28px; }
+
+  /* ─── Code block ─── */
+  .code-block {
+    background: #1E1E2E; color: #CDD6F4; border-radius: 10px;
+    padding: 16px 20px; font-family: 'Courier New', monospace; font-size: 12.5px;
+    line-height: 1.8; overflow-x: auto; margin: 14px 0;
+  }
+  .code-block .kw { color: #CBA6F7; } /* keyword */
+  .code-block .fn { color: #89DCEB; } /* function */
+  .code-block .st { color: #A6E3A1; } /* string */
+  .code-block .cm { color: #585B70; } /* comment */
+
+  @media (max-width: 768px) {
+    #sidebar { transform: translateX(-100%); }
+    #main { margin-left: 0; padding: 20px; }
+    .hero { flex-direction: column; }
+    .toc-list { columns: 1; }
+  }
+</style>
+<link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+
+<!-- ══════════ SIDEBAR ══════════ -->
+<nav id="sidebar">
+  <div class="sidebar-logo">
+    <h1>📊 Zoho Analytics</h1>
+    <span>TRACSaaS_PROD Playbook</span>
+  </div>
+
+  <div class="sidebar-section">
+    <div class="sidebar-section-title">เริ่มต้น</div>
+    <a href="#intro"   class="sidebar-link active"><span class="icon">🏠</span> ภาพรวมระบบ</a>
+    <a href="#menu"    class="sidebar-link"><span class="icon">🗂️</span> เมนูหลัก</a>
+    <a href="#roles"   class="sidebar-link"><span class="icon">👥</span> Role &amp; สิทธิ์</a>
+  </div>
+
+  <div class="sidebar-section">
+    <div class="sidebar-section-title">👤 End User</div>
+    <a href="#user-login"      class="sidebar-link"><span class="icon">🔐</span> เข้าสู่ระบบ</a>
+    <a href="#user-dashboard"  class="sidebar-link"><span class="icon">📊</span> ดู Dashboard</a>
+    <a href="#user-report"     class="sidebar-link"><span class="icon">📋</span> ดู Report</a>
+    <a href="#user-filter"     class="sidebar-link"><span class="icon">🔍</span> กรองข้อมูล</a>
+    <a href="#user-export"     class="sidebar-link"><span class="icon">📥</span> Export ข้อมูล</a>
+    <a href="#user-zia"        class="sidebar-link"><span class="icon">🤖</span> Ask Zia (AI)</a>
+  </div>
+
+  <div class="sidebar-section">
+    <div class="sidebar-section-title">🔧 Admin / IT</div>
+    <a href="#admin-workspace"  class="sidebar-link"><span class="icon">🏢</span> Workspace</a>
+    <a href="#admin-user"       class="sidebar-link"><span class="icon">👤</span> จัดการ User</a>
+    <a href="#admin-datasource" class="sidebar-link"><span class="icon">🔌</span> Data Source</a>
+    <a href="#admin-permission" class="sidebar-link"><span class="icon">🔒</span> Permission</a>
+    <a href="#admin-settings"   class="sidebar-link"><span class="icon">⚙️</span> Settings</a>
+  </div>
+
+  <div class="sidebar-section">
+    <div class="sidebar-section-title">📈 Data Analyst</div>
+    <a href="#analyst-table"   class="sidebar-link"><span class="icon">📁</span> Data &amp; Tables</a>
+    <a href="#analyst-report"  class="sidebar-link"><span class="icon">📊</span> สร้าง Report</a>
+    <a href="#analyst-chart"   class="sidebar-link"><span class="icon">📉</span> Chart Types</a>
+    <a href="#analyst-formula" class="sidebar-link"><span class="icon">🧮</span> Formula</a>
+    <a href="#analyst-query"   class="sidebar-link"><span class="icon">💾</span> Query Table</a>
+    <a href="#analyst-dash"    class="sidebar-link"><span class="icon">🖥️</span> สร้าง Dashboard</a>
+  </div>
+
+  <div class="sidebar-section">
+    <div class="sidebar-section-title">อ้างอิง</div>
+    <a href="#faq"    class="sidebar-link"><span class="icon">❓</span> FAQ</a>
+    <a href="#tips"   class="sidebar-link"><span class="icon">💡</span> Tips &amp; Tricks</a>
+  </div>
+</nav>
+
+<!-- ══════════ MAIN ══════════ -->
+<main id="main">
+
+  <!-- Hero -->
+  <div class="hero">
+    <div>
+      <h2>📊 Zoho Analytics Playbook</h2>
+      <p>คู่มือการใช้งาน Zoho Analytics สำหรับ TRACSaaS_PROD ครอบคลุมทุก Role — End User, Admin/IT และ Data Analyst ภาษาไทยเต็มรูปแบบ</p>
+    </div>
+    <div class="hero-badge">TRACSaaS_PROD v2025</div>
+  </div>
+
+  <!-- TOC -->
+  <div class="toc">
+    <h4>📑 สารบัญ</h4>
+    <ul class="toc-list">
+      <li><a href="#intro">ภาพรวมระบบ</a></li>
+      <li><a href="#menu">เมนูหลัก</a></li>
+      <li><a href="#roles">Role &amp; สิทธิ์</a></li>
+      <li><a href="#user-login">เข้าสู่ระบบ</a></li>
+      <li><a href="#user-dashboard">ดู Dashboard</a></li>
+      <li><a href="#user-report">ดู Report</a></li>
+      <li><a href="#user-filter">กรองข้อมูล</a></li>
+      <li><a href="#user-export">Export ข้อมูล</a></li>
+      <li><a href="#user-zia">Ask Zia (AI)</a></li>
+      <li><a href="#admin-workspace">Workspace Management</a></li>
+      <li><a href="#admin-user">จัดการ User</a></li>
+      <li><a href="#admin-datasource">Data Source</a></li>
+      <li><a href="#admin-permission">Permission</a></li>
+      <li><a href="#analyst-table">Data &amp; Tables</a></li>
+      <li><a href="#analyst-report">สร้าง Report</a></li>
+      <li><a href="#analyst-formula">Formula</a></li>
+      <li><a href="#analyst-query">Query Table</a></li>
+      <li><a href="#analyst-dash">สร้าง Dashboard</a></li>
+      <li><a href="#faq">FAQ</a></li>
+      <li><a href="#tips">Tips &amp; Tricks</a></li>
+    </ul>
+  </div>
+
+  <!-- ═══════════════════════════ INTRO ═══════════════════════════ -->
+  <section class="section" id="intro">
+    <div class="section-header">
+      <span class="section-icon">🏠</span>
+      <h3>ภาพรวมระบบ <span class="badge badge-all">ทุก Role</span></h3>
+    </div>
+    <p style="font-size:14px;line-height:1.8;margin-bottom:18px;">
+      <strong>Zoho Analytics</strong> คือแพลตฟอร์ม Business Intelligence (BI) ที่ใช้สำหรับวิเคราะห์ข้อมูล สร้าง Report และ Dashboard แบบ Interactive
+      สำหรับองค์กร TRAC ได้ติดตั้ง Workspace ชื่อ <strong>TRACSaaS_PROD</strong> ซึ่งเชื่อมต่อกับฐานข้อมูลหลักของระบบ
+    </p>
+    <div class="cards">
+      <div class="card"><div class="card-icon">📊</div><h4>รายงานแบบ Real-time</h4><p>ข้อมูลอัปเดตอัตโนมัติจากฐานข้อมูล ไม่ต้องรอรายงาน manual</p></div>
+      <div class="card"><div class="card-icon">🖥️</div><h4>Dashboard แบบ Interactive</h4><p>คลิกกรองข้อมูล เจาะลึก (Drill-down) ได้โดยตรงบนหน้าจอ</p></div>
+      <div class="card"><div class="card-icon">🤖</div><h4>AI — Ask Zia</h4><p>ถามคำถามเป็นภาษาธรรมชาติ ระบบจะสร้างกราฟให้อัตโนมัติ</p></div>
+      <div class="card"><div class="card-icon">🔒</div><h4>Row-level Security</h4><p>ควบคุมข้อมูลที่แต่ละ User มองเห็นได้ในระดับ Row</p></div>
+      <div class="card"><div class="card-icon">📥</div><h4>Export หลายรูปแบบ</h4><p>รองรับ Excel, PDF, CSV, Image และ Email Scheduling</p></div>
+      <div class="card"><div class="card-icon">🔌</div><h4>เชื่อมต่อหลาย Data Source</h4><p>รองรับ MySQL, MS SQL, Google Sheets, REST API และอื่นๆ</p></div>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════ MENU ═══════════════════════════ -->
+  <section class="section" id="menu">
+    <div class="section-header">
+      <span class="section-icon">🗂️</span>
+      <h3>เมนูหลัก <span class="badge badge-all">ทุก Role</span></h3>
+    </div>
+    <p style="font-size:13.5px;color:var(--text-muted);margin-bottom:16px;">เมนูด้านซ้ายของระบบ Zoho Analytics มีฟังก์ชันหลักดังนี้</p>
+    <div class="menu-grid">
+      <div class="menu-item"><div class="mi-icon">📁</div><div class="mi-name">Explorer</div><div class="mi-desc">เรียกดูไฟล์ Report, Dashboard ทั้งหมดใน Workspace</div></div>
+      <div class="menu-item"><div class="mi-icon">📊</div><div class="mi-name">Dashboards</div><div class="mi-desc">เปิดดู Dashboard ที่ถูก Publish ไว้สำหรับทีมงาน</div></div>
+      <div class="menu-item"><div class="mi-icon">📋</div><div class="mi-name">Reports</div><div class="mi-desc">รายการ Report / Chart ทั้งหมดที่สร้างในระบบ</div></div>
+      <div class="menu-item"><div class="mi-icon">🗃️</div><div class="mi-name">Data</div><div class="mi-desc">จัดการ Table, Import ข้อมูล, ดู Schema</div></div>
+      <div class="menu-item"><div class="mi-icon">🤖</div><div class="mi-name">Ask Zia</div><div class="mi-desc">ถามคำถามด้วยภาษาธรรมชาติ AI ตอบพร้อม Chart</div></div>
+      <div class="menu-item"><div class="mi-icon">💻</div><div class="mi-name">Code Studio</div><div class="mi-desc">เขียน Custom Script / Automation ขั้นสูง</div></div>
+      <div class="menu-item"><div class="mi-icon">🧠</div><div class="mi-name">AutoML</div><div class="mi-desc">สร้าง Machine Learning Model โดยไม่ต้องเขียนโค้ด</div></div>
+      <div class="menu-item"><div class="mi-icon">🔌</div><div class="mi-name">Data Sources</div><div class="mi-desc">เชื่อมต่อและจัดการแหล่งข้อมูลต่างๆ</div></div>
+      <div class="menu-item"><div class="mi-icon">⚙️</div><div class="mi-name">Settings</div><div class="mi-desc">ตั้งค่า Workspace, User, Permission (Admin only)</div></div>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════ ROLES ═══════════════════════════ -->
+  <section class="section" id="roles">
+    <div class="section-header">
+      <span class="section-icon">👥</span>
+      <h3>Role &amp; สิทธิ์การใช้งาน <span class="badge badge-admin">Admin</span></h3>
+    </div>
+    <div class="tbl-wrap">
+      <table>
+        <thead>
+          <tr><th>Role</th><th>ดู Report/Dashboard</th><th>สร้าง Report</th><th>จัดการ Data</th><th>จัดการ User</th><th>ตั้งค่า Workspace</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><strong>Workspace Admin</strong></td><td>✅</td><td>✅</td><td>✅</td><td>✅</td><td>✅</td></tr>
+          <tr><td><strong>Workspace Developer</strong></td><td>✅</td><td>✅</td><td>✅</td><td>❌</td><td>❌</td></tr>
+          <tr><td><strong>Workspace Analyst</strong></td><td>✅</td><td>✅</td><td>✅ (บาง)</td><td>❌</td><td>❌</td></tr>
+          <tr><td><strong>Workspace Viewer</strong></td><td>✅</td><td>❌</td><td>❌</td><td>❌</td><td>❌</td></tr>
+          <tr><td><strong>Guest User</strong></td><td>✅ (เฉพาะที่แชร์)</td><td>❌</td><td>❌</td><td>❌</td><td>❌</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="tip"><span class="tip-icon">💡</span><div>ควรกำหนด Role ตามหน้าที่จริง — ไม่ควรให้ทุกคนเป็น Admin เพื่อความปลอดภัยของข้อมูล</div></div>
+  </section>
+
+  <hr>
+
+  <!-- ═══════════════════════════ USER SECTION ═══════════════════════════ -->
+  <p class="subtitle">👤 End User — สำหรับผู้ใช้งานทั่วไป ที่ต้องการดู Report และ Dashboard</p>
+
+  <!-- Login -->
+  <section class="section" id="user-login">
+    <div class="section-header">
+      <span class="section-icon">🔐</span>
+      <h3>เข้าสู่ระบบ <span class="badge badge-user">User</span></h3>
+    </div>
+    <div class="steps">
+      <div class="step">เปิดเว็บเบราว์เซอร์ ไปที่ <strong>analytics.zoho.com</strong> หรือลิงก์ที่ Admin แชร์ให้</div>
+      <div class="step">คลิก <strong>"Sign In"</strong> → ใส่อีเมลองค์กร (Zoho Account) แล้วกด <strong>Next</strong></div>
+      <div class="step">ใส่ <strong>Password</strong> → คลิก <strong>Sign In</strong> (หากมี 2FA ให้กรอก OTP จากแอปหรืออีเมล)</div>
+      <div class="step">หลังเข้าสู่ระบบ จะเห็นหน้า <strong>Home</strong> → เลือก Workspace <code>TRACSaaS_PROD</code></div>
+    </div>
+    <div class="warn"><span class="tip-icon">⚠️</span><div>หากยังไม่มีบัญชี ให้ติดต่อ Admin เพื่อขอสิทธิ์ ไม่ควรสมัครบัญชีใหม่เองโดยไม่ได้รับอนุญาต</div></div>
+  </section>
+
+  <!-- Dashboard -->
+  <section class="section" id="user-dashboard">
+    <div class="section-header">
+      <span class="section-icon">📊</span>
+      <h3>ดู Dashboard <span class="badge badge-user">User</span></h3>
+    </div>
+    <div class="steps">
+      <div class="step">ใน Workspace คลิกเมนู <strong>Dashboards</strong> ที่แถบซ้าย</div>
+      <div class="step">เลือก Dashboard ที่ต้องการจากรายการ — สังเกต icon 📊 สีน้ำเงิน</div>
+      <div class="step">หน้า Dashboard จะแสดง Widget หลายชิ้น เช่น กราฟ, ตัวเลข KPI, ตาราง</div>
+      <div class="step">คลิกที่กราฟหรือตัวเลขใดก็ได้ เพื่อ <strong>Drill-down</strong> ดูรายละเอียดเพิ่มเติม</div>
+      <div class="step">ใช้ <strong>Date Filter</strong> หรือ <strong>Dropdown Filter</strong> ที่มุมบนขวาของ Dashboard เพื่อเปลี่ยนช่วงเวลา</div>
+    </div>
+    <div class="tip"><span class="tip-icon">💡</span><div>กด <strong>F11</strong> หรือ Full Screen button เพื่อแสดง Dashboard แบบเต็มจอ เหมาะสำหรับ TV Dashboard ในออฟฟิศ</div></div>
+  </section>
+
+  <!-- Report -->
+  <section class="section" id="user-report">
+    <div class="section-header">
+      <span class="section-icon">📋</span>
+      <h3>ดู Report <span class="badge badge-user">User</span></h3>
+    </div>
+    <div class="steps">
+      <div class="step">คลิกเมนู <strong>Reports</strong> ที่แถบซ้าย หรือเข้าผ่าน <strong>Explorer</strong> แล้วกรอง Type = Report</div>
+      <div class="step">เลือก Report ที่ต้องการ — Report อาจเป็น Chart, Table หรือ Pivot ก็ได้</div>
+      <div class="step">หากเป็น Table Report สามารถ <strong>คลิกหัวคอลัมน์</strong> เพื่อเรียงลำดับข้อมูล</div>
+      <div class="step">กด <strong>Apply Filter</strong> (icon รูปกรวย) เพื่อกรองข้อมูลตามเงื่อนไขที่ต้องการ</div>
+    </div>
+  </section>
+
+  <!-- Filter -->
+  <section class="section" id="user-filter">
+    <div class="section-header">
+      <span class="section-icon">🔍</span>
+      <h3>กรองข้อมูล (Filter) <span class="badge badge-user">User</span></h3>
+    </div>
+    <div class="tbl-wrap">
+      <table>
+        <thead><tr><th>ประเภท Filter</th><th>วิธีใช้</th><th>ตัวอย่าง</th></tr></thead>
+        <tbody>
+          <tr><td><strong>User Filter</strong></td><td>กด icon กรวย → เลือกค่า</td><td>กรองตาม Branch, ประเภทรถ</td></tr>
+          <tr><td><strong>Date Range</strong></td><td>คลิก Date Picker ที่ Widget</td><td>เดือนที่ผ่านมา, ปีนี้</td></tr>
+          <tr><td><strong>Quick Filter</strong></td><td>คลิกที่ Legend หรือ Bar บนกราฟ</td><td>คลิกเลือก Region ใน Pie Chart</td></tr>
+          <tr><td><strong>URL Filter</strong></td><td>เพิ่ม parameter ท้าย URL (สำหรับ Embed)</td><td><code>?ZOHO_CRITERIA=branch="BKK"</code></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- Export -->
+  <section class="section" id="user-export">
+    <div class="section-header">
+      <span class="section-icon">📥</span>
+      <h3>Export ข้อมูล <span class="badge badge-user">User</span></h3>
+    </div>
+    <div class="steps">
+      <div class="step">เปิด Report หรือ Dashboard ที่ต้องการ Export</div>
+      <div class="step">คลิกไอคอน <strong>⋮ (More Options)</strong> หรือ <strong>Export</strong> ที่มุมขวาบน</div>
+      <div class="step">เลือกรูปแบบ: <code>Excel (.xlsx)</code> / <code>PDF</code> / <code>CSV</code> / <code>Image (.png)</code></div>
+      <div class="step">เลือกตัวเลือกเพิ่มเติม เช่น Export ทุกหน้า หรือเฉพาะหน้าที่เห็น แล้วกด <strong>Export</strong></div>
+    </div>
+    <div class="note"><span class="tip-icon">✅</span><div>สำหรับ Report ที่ต้องส่งอัตโนมัติทุกสัปดาห์ ให้ขอให้ Analyst หรือ Admin ตั้งค่า <strong>Email Scheduling</strong> ให้</div></div>
+  </section>
+
+  <!-- Ask Zia -->
+  <section class="section" id="user-zia">
+    <div class="section-header">
+      <span class="section-icon">🤖</span>
+      <h3>Ask Zia — AI Assistant <span class="badge badge-user">User</span></h3>
+    </div>
+    <p style="font-size:13.5px;line-height:1.75;margin-bottom:16px;">
+      Ask Zia คือ AI ของ Zoho ที่รับคำถามภาษาธรรมชาติ (ภาษาอังกฤษ) แล้วสร้าง Chart หรือตอบคำถามจากข้อมูลใน Workspace โดยอัตโนมัติ
+    </p>
+    <div class="steps">
+      <div class="step">คลิกเมนู <strong>Ask Zia</strong> ที่แถบซ้าย</div>
+      <div class="step">เลือก Table ที่ต้องการถามจาก Dropdown</div>
+      <div class="step">พิมพ์คำถามเป็นภาษาอังกฤษ เช่น <code>"Show me total revenue by branch this month"</code></div>
+      <div class="step">Zia จะสร้างกราฟให้อัตโนมัติ สามารถกด <strong>"Add to Dashboard"</strong> เพื่อบันทึกได้</div>
+    </div>
+    <div class="tbl-wrap">
+      <table>
+        <thead><tr><th>ตัวอย่างคำถาม Zia</th><th>ความหมาย</th></tr></thead>
+        <tbody>
+          <tr><td><code>Top 10 customers by revenue</code></td><td>ลูกค้า 10 อันดับแรกตามรายได้</td></tr>
+          <tr><td><code>Monthly agreement count last year</code></td><td>จำนวนสัญญาแต่ละเดือนปีที่แล้ว</td></tr>
+          <tr><td><code>Fleet utilization by car group</code></td><td>อัตราใช้งานรถแยกตามกลุ่มรถ</td></tr>
+          <tr><td><code>Overdue invoices count by branch</code></td><td>จำนวน Invoice เกินกำหนดแยก Branch</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <hr>
+
+  <!-- ═══════════════════════════ ADMIN SECTION ═══════════════════════════ -->
+  <p class="subtitle">🔧 Admin / IT — สำหรับผู้ดูแลระบบ จัดการ Workspace, User และ Data Source</p>
+
+  <!-- Workspace -->
+  <section class="section" id="admin-workspace">
+    <div class="section-header">
+      <span class="section-icon">🏢</span>
+      <h3>Workspace Management <span class="badge badge-admin">Admin</span></h3>
+    </div>
+    <div class="cards">
+      <div class="card"><div class="card-icon">📝</div><h4>ตั้งค่า Workspace</h4><p>Settings → General → แก้ไขชื่อ, Description, Timezone ของ Workspace</p></div>
+      <div class="card"><div class="card-icon">🗑️</div><h4>Trash Management</h4><p>ของที่ถูกลบจะอยู่ใน Trash 30 วัน ก่อนลบถาวร สามารถ Restore ได้</p></div>
+      <div class="card"><div class="card-icon">📤</div><h4>Backup & Export</h4><p>Settings → Backup → Export Workspace เป็นไฟล์ .zip เก็บสำรองได้</p></div>
+    </div>
+  </section>
+
+  <!-- User Management -->
+  <section class="section" id="admin-user">
+    <div class="section-header">
+      <span class="section-icon">👤</span>
+      <h3>จัดการ User <span class="badge badge-admin">Admin</span></h3>
+    </div>
+    <div class="steps">
+      <div class="step">ไปที่ <strong>Settings → Users</strong></div>
+      <div class="step">คลิก <strong>"Invite User"</strong> → ใส่อีเมลผู้ใช้ → เลือก Role ที่เหมาะสม</div>
+      <div class="step">ผู้ใช้จะได้รับ Email Invitation → ให้ยืนยันและตั้ง Password</div>
+      <div class="step">หากต้องการแก้ Role ให้คลิก Edit icon หน้าชื่อ User → เปลี่ยน Role → Save</div>
+      <div class="step">หากต้องการลบ User คลิก <strong>Remove</strong> → User จะสูญเสียสิทธิ์ทันที แต่ข้อมูลที่สร้างไว้ยังคงอยู่</div>
+    </div>
+    <div class="warn"><span class="tip-icon">⚠️</span><div>การลบ User ไม่สามารถย้อนกลับได้ ควร Deactivate ก่อนถ้าไม่แน่ใจ</div></div>
+  </section>
+
+  <!-- Data Source -->
+  <section class="section" id="admin-datasource">
+    <div class="section-header">
+      <span class="section-icon">🔌</span>
+      <h3>จัดการ Data Source <span class="badge badge-admin">Admin</span></h3>
+    </div>
+    <div class="steps">
+      <div class="step">คลิกเมนู <strong>Data Sources</strong> ที่แถบซ้าย → คลิก <strong>"+ New Data Source"</strong></div>
+      <div class="step">เลือกประเภท: <code>Database</code> / <code>Cloud Storage</code> / <code>File</code> / <code>API</code></div>
+      <div class="step">กรอก Connection String: Host, Port, Database Name, Username, Password</div>
+      <div class="step">คลิก <strong>"Test Connection"</strong> เพื่อทดสอบ → ถ้า Success กด <strong>Save</strong></div>
+      <div class="step">เลือก Table ที่ต้องการ Sync → ตั้ง Schedule Import (Manual / Periodic)</div>
+    </div>
+    <div class="tbl-wrap">
+      <table>
+        <thead><tr><th>Data Source Type</th><th>ตัวอย่าง</th><th>ความถี่ Sync</th></tr></thead>
+        <tbody>
+          <tr><td>Database (MySQL/MSSQL)</td><td>ระบบ ERP, Rental DB</td><td>ทุก 1–24 ชั่วโมง</td></tr>
+          <tr><td>Cloud File</td><td>Google Drive, OneDrive</td><td>Manual / Daily</td></tr>
+          <tr><td>REST API</td><td>EHI, Payment Gateway</td><td>ทุก 15 นาที – 1 ชม.</td></tr>
+          <tr><td>Upload File</td><td>Excel, CSV</td><td>Manual เท่านั้น</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- Permission -->
+  <section class="section" id="admin-permission">
+    <div class="section-header">
+      <span class="section-icon">🔒</span>
+      <h3>Permission &amp; Row-level Security <span class="badge badge-admin">Admin</span></h3>
+    </div>
+    <p style="font-size:13.5px;line-height:1.75;margin-bottom:14px;">
+      Zoho Analytics รองรับการควบคุมข้อมูลระดับ Row ทำให้ User แต่ละคนเห็นข้อมูลเฉพาะส่วนที่เกี่ยวข้องกับตัวเอง
+    </p>
+    <div class="steps">
+      <div class="step">ไปที่ <strong>Data → เลือก Table → คลิก ⋮ → Share</strong></div>
+      <div class="step">เลือก User หรือ Group → กำหนดระดับ: <code>Read</code> / <code>Read & Write</code></div>
+      <div class="step">เพื่อตั้ง Row-level Security: คลิก <strong>"Row-level Security"</strong> → <strong>"Add Criteria"</strong></div>
+      <div class="step">ตั้งเงื่อนไข เช่น <code>branch_code = [USER_EMAIL]</code> → บันทึก</div>
+    </div>
+    <div class="tip"><span class="tip-icon">💡</span><div>ใช้ <strong>User Attribute</strong> เช่น <code>ZOHO_USER_EMAIL</code> ในเงื่อนไข Row-level Security เพื่อให้ระบบ filter ข้อมูลโดยอัตโนมัติตามผู้ Login</div></div>
+  </section>
+
+  <!-- Settings -->
+  <section class="section" id="admin-settings">
+    <div class="section-header">
+      <span class="section-icon">⚙️</span>
+      <h3>Settings <span class="badge badge-admin">Admin</span></h3>
+    </div>
+    <div class="tbl-wrap">
+      <table>
+        <thead><tr><th>เมนู Settings</th><th>รายละเอียด</th></tr></thead>
+        <tbody>
+          <tr><td><strong>General</strong></td><td>ชื่อ Workspace, Timezone, Logo, สี Theme</td></tr>
+          <tr><td><strong>Users</strong></td><td>เพิ่ม / ลบ / แก้ Role User</td></tr>
+          <tr><td><strong>Groups</strong></td><td>สร้างกลุ่ม User เพื่อกำหนดสิทธิ์พร้อมกัน</td></tr>
+          <tr><td><strong>Email Settings</strong></td><td>ตั้งค่า SMTP สำหรับส่ง Report ทางอีเมล</td></tr>
+          <tr><td><strong>API Keys</strong></td><td>สร้าง API Token สำหรับ Integration กับระบบอื่น</td></tr>
+          <tr><td><strong>Audit Log</strong></td><td>ดู Log การใช้งานของ User ทุกคน (ใครดูอะไร, เมื่อไร)</td></tr>
+          <tr><td><strong>White Label</strong></td><td>ซ่อน Zoho Branding ใช้ Domain ขององค์กร</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <hr>
+
+  <!-- ═══════════════════════════ ANALYST SECTION ═══════════════════════════ -->
+  <p class="subtitle">📈 Data Analyst — สำหรับนักวิเคราะห์ข้อมูล สร้าง Report, Chart, Formula และ Dashboard</p>
+
+  <!-- Data Table -->
+  <section class="section" id="analyst-table">
+    <div class="section-header">
+      <span class="section-icon">📁</span>
+      <h3>Data &amp; Tables <span class="badge badge-analyst">Analyst</span></h3>
+    </div>
+    <div class="steps">
+      <div class="step">คลิกเมนู <strong>Data</strong> → เห็นรายการ Table ทั้งหมดใน Workspace</div>
+      <div class="step">คลิก Table เพื่อดู Schema และ Preview ข้อมูล 50 แถวแรก</div>
+      <div class="step">คลิก <strong>"+ New Table"</strong> เพื่อ Upload ไฟล์ใหม่ หรือเชื่อมกับ Data Source</div>
+      <div class="step">ใช้ <strong>Lookup Column</strong> เพื่อ Join ข้อมูลจากหลาย Table โดยไม่ต้องเขียน SQL</div>
+    </div>
+    <div class="tip"><span class="tip-icon">💡</span><div>ตรวจสอบประเภทคอลัมน์ให้ถูกต้อง เช่น Date ต้องเป็น Date ไม่ใช่ Text ไม่เช่นนั้นจะ Group By เดือน/ปีไม่ได้</div></div>
+  </section>
+
+  <!-- Report -->
+  <section class="section" id="analyst-report">
+    <div class="section-header">
+      <span class="section-icon">📊</span>
+      <h3>สร้าง Report <span class="badge badge-analyst">Analyst</span></h3>
+    </div>
+    <div class="steps">
+      <div class="step">คลิก <strong>"+ New"</strong> → เลือก <strong>"Chart"</strong> หรือ <strong>"Pivot Table"</strong> หรือ <strong>"Summary View"</strong></div>
+      <div class="step">เลือก Table ที่ต้องการ → Design Editor จะเปิดขึ้นมา</div>
+      <div class="step">ลาก Column จาก Column Panel ด้านซ้าย ไปวางใน <strong>X-Axis / Y-Axis</strong></div>
+      <div class="step">เลือก Aggregation: <code>Sum</code> / <code>Count</code> / <code>Average</code> / <code>Distinct Count</code></div>
+      <div class="step">เพิ่ม <strong>Color By</strong> หรือ <strong>Group By</strong> เพื่อแยกสีหรือแยกกลุ่มข้อมูล</div>
+      <div class="step">ตั้งชื่อ Report → คลิก <strong>Save</strong></div>
+    </div>
+  </section>
+
+  <!-- Chart Types -->
+  <section class="section" id="analyst-chart">
+    <div class="section-header">
+      <span class="section-icon">📉</span>
+      <h3>ประเภท Chart <span class="badge badge-analyst">Analyst</span></h3>
+    </div>
+    <div class="tbl-wrap">
+      <table>
+        <thead><tr><th>Chart Type</th><th>เหมาะกับ</th><th>ตัวอย่างการใช้งาน</th></tr></thead>
+        <tbody>
+          <tr><td>📊 Bar Chart</td><td>เปรียบเทียบหมวดหมู่</td><td>Revenue แยก Branch, ยอดขายแยก Car Group</td></tr>
+          <tr><td>📈 Line Chart</td><td>แนวโน้มตามเวลา</td><td>จำนวนสัญญาแต่ละเดือน, Fleet Utilization รายวัน</td></tr>
+          <tr><td>🥧 Pie/Donut</td><td>สัดส่วนรวม</td><td>% รายได้แต่ละ Region, Mix ประเภทรถ</td></tr>
+          <tr><td>🗺️ Map Chart</td><td>ข้อมูลตามพื้นที่ภูมิศาสตร์</td><td>จำนวนรถแยกจังหวัด</td></tr>
+          <tr><td>🎯 Gauge/KPI</td><td>แสดงค่าเดียวเทียบ Target</td><td>Utilization %, Revenue vs Target</td></tr>
+          <tr><td>📋 Pivot Table</td><td>วิเคราะห์แบบ Cross-tab</td><td>Revenue แยก Branch × Car Group × เดือน</td></tr>
+          <tr><td>🌡️ Heat Map</td><td>ความหนาแน่น 2 มิติ</td><td>วันที่ × สาขา แสดงปริมาณการจอง</td></tr>
+          <tr><td>📦 Funnel</td><td>ลำดับขั้นตอน</td><td>Sales Funnel: Lead → Prospect → Closed</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- Formula -->
+  <section class="section" id="analyst-formula">
+    <div class="section-header">
+      <span class="section-icon">🧮</span>
+      <h3>Formula Column <span class="badge badge-analyst">Analyst</span></h3>
+    </div>
+    <p style="font-size:13.5px;line-height:1.75;margin-bottom:14px;">
+      Zoho Analytics รองรับการสร้าง Calculated Column ใน Table เพื่อคำนวณค่าใหม่โดยไม่ต้องแก้ข้อมูลต้นทาง
+    </p>
+    <div class="steps">
+      <div class="step">เปิด Table → คลิก <strong>"Add → Formula Column"</strong></div>
+      <div class="step">พิมพ์ชื่อคอลัมน์ → เขียน Formula ในช่อง Expression</div>
+      <div class="step">คลิก <strong>Save</strong> — คอลัมน์ใหม่จะแสดงในทุก Report ที่ใช้ Table นี้</div>
+    </div>
+    <div class="tbl-wrap">
+      <table>
+        <thead><tr><th>ตัวอย่าง Formula</th><th>อธิบาย</th></tr></thead>
+        <tbody>
+          <tr><td><code>"Revenue" - "Cost"</code></td><td>คำนวณ Gross Profit</td></tr>
+          <tr><td><code>"Revenue" / "Days" * 30</code></td><td>ประมาณรายได้ต่อเดือน</td></tr>
+          <tr><td><code>datediff("return_date", "checkout_date")</code></td><td>จำนวนวันที่เช่า</td></tr>
+          <tr><td><code>if("status" = 'Active', 1, 0)</code></td><td>Flag ว่า Active หรือไม่</td></tr>
+          <tr><td><code>concat("branch_code", " - ", "branch_name")</code></td><td>รวมสอง Column เป็น Label</td></tr>
+          <tr><td><code>year("agreement_date")</code></td><td>ดึงปีจาก Date Column</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="code-block">
+<span class="cm">-- ตัวอย่าง: คำนวณ Utilization % ของรถ</span>
+<span class="kw">if</span>(<span class="st">"total_fleet"</span> &gt; 0,
+  (<span class="st">"rented_cars"</span> / <span class="st">"total_fleet"</span>) * 100,
+  0
+)
+
+<span class="cm">-- ตัวอย่าง: จัดกลุ่ม Aging</span>
+<span class="kw">if</span>(<span class="st">"days_overdue"</span> &lt;= 30, <span class="st">'0-30 วัน'</span>,
+  <span class="kw">if</span>(<span class="st">"days_overdue"</span> &lt;= 60, <span class="st">'31-60 วัน'</span>,
+    <span class="kw">if</span>(<span class="st">"days_overdue"</span> &lt;= 90, <span class="st">'61-90 วัน'</span>, <span class="st">'90+ วัน'</span>)))
+    </div>
+  </section>
+
+  <!-- Query Table -->
+  <section class="section" id="analyst-query">
+    <div class="section-header">
+      <span class="section-icon">💾</span>
+      <h3>Query Table (SQL) <span class="badge badge-analyst">Analyst</span></h3>
+    </div>
+    <p style="font-size:13.5px;line-height:1.75;margin-bottom:14px;">
+      Query Table ช่วยให้เขียน SQL เพื่อ Join, Filter หรือ Transform ข้อมูลจากหลาย Table พร้อมกัน ผลลัพธ์จะเป็น Virtual Table ที่ใช้สร้าง Report ได้
+    </p>
+    <div class="steps">
+      <div class="step">ไปที่ <strong>Data → "+ New Table" → "Query Table"</strong></div>
+      <div class="step">เขียน SQL ในช่อง Query Editor</div>
+      <div class="step">คลิก <strong>Run</strong> เพื่อ Preview ผลลัพธ์ 50 แถวแรก</div>
+      <div class="step">ตั้งชื่อ → คลิก <strong>Save</strong> → ใช้เป็น Table ปกติในการสร้าง Report</div>
+    </div>
+    <div class="code-block">
+<span class="cm">-- ตัวอย่าง: Report สรุปยอดเช่าแต่ละ Branch เดือนนี้</span>
+<span class="kw">SELECT</span>
+  b.branch_name,
+  <span class="fn">COUNT</span>(a.agreement_id)  <span class="kw">AS</span> total_agreements,
+  <span class="fn">SUM</span>(a.total_amount)    <span class="kw">AS</span> total_revenue,
+  <span class="fn">AVG</span>(a.rental_days)    <span class="kw">AS</span> avg_rental_days
+<span class="kw">FROM</span> Agreement_Rental a
+<span class="kw">JOIN</span> Data_Branch b <span class="kw">ON</span> a.branch_code = b.branch_code
+<span class="kw">WHERE</span> <span class="fn">MONTH</span>(a.agreement_date) = <span class="fn">MONTH</span>(<span class="fn">NOW</span>())
+  <span class="kw">AND</span> <span class="fn">YEAR</span>(a.agreement_date)  = <span class="fn">YEAR</span>(<span class="fn">NOW</span>())
+<span class="kw">GROUP BY</span> b.branch_name
+<span class="kw">ORDER BY</span> total_revenue <span class="kw">DESC</span>
+    </div>
+    <div class="warn"><span class="tip-icon">⚠️</span><div>Query Table เป็น <strong>Read-only Virtual Table</strong> — ไม่สามารถ Edit ข้อมูลโดยตรงได้ และจะ Re-execute SQL ทุกครั้งที่ Report ถูกเปิด</div></div>
+  </section>
+
+  <!-- Dashboard Builder -->
+  <section class="section" id="analyst-dash">
+    <div class="section-header">
+      <span class="section-icon">🖥️</span>
+      <h3>สร้าง Dashboard <span class="badge badge-analyst">Analyst</span></h3>
+    </div>
+    <div class="steps">
+      <div class="step">คลิก <strong>"+ New" → "Dashboard"</strong> → ตั้งชื่อ Dashboard</div>
+      <div class="step">คลิก <strong>"Add Widget"</strong> → เลือก Report ที่สร้างไว้แล้ว → กด Add</div>
+      <div class="step">ลากขยายขนาด Widget ได้โดยลาก Handle มุมขวาล่าง</div>
+      <div class="step">คลิก <strong>"Add Filter"</strong> เพื่อเพิ่ม User Filter ที่ใช้กรองข้อมูลทุก Widget พร้อมกัน</div>
+      <div class="step">ตั้งค่า <strong>Auto-refresh</strong>: Edit Dashboard → Settings → Set Refresh Interval</div>
+      <div class="step">คลิก <strong>"Publish"</strong> → เลือก User / Group ที่จะแชร์ Dashboard นี้</div>
+    </div>
+    <div class="tip"><span class="tip-icon">💡</span><div>ใช้ <strong>Tab Layout</strong> ใน Dashboard เพื่อแบ่งหน้าย่อย เช่น Tab "Overview" / "Fleet" / "Finance" ไว้ใน Dashboard เดียวกัน</div></div>
+  </section>
+
+  <hr>
+
+  <!-- ═══════════════════════════ FAQ ═══════════════════════════ -->
+  <section class="section" id="faq">
+    <div class="section-header">
+      <span class="section-icon">❓</span>
+      <h3>FAQ — คำถามที่พบบ่อย <span class="badge badge-all">ทุก Role</span></h3>
+    </div>
+    <div class="tbl-wrap">
+      <table>
+        <thead><tr><th>คำถาม</th><th>คำตอบ</th></tr></thead>
+        <tbody>
+          <tr><td>ข้อมูลใน Report ไม่อัปเดต?</td><td>ตรวจสอบ Last Sync Time ที่ Data Source → กด <strong>Sync Now</strong> เพื่อ Force update</td></tr>
+          <tr><td>ไม่เห็นบาง Table หรือ Report?</td><td>ติดต่อ Admin เพื่อขอสิทธิ์ — อาจเป็นเรื่อง Permission ที่ยังไม่ได้กำหนด</td></tr>
+          <tr><td>Export Excel แล้วข้อมูลหาย?</td><td>Zoho Export ได้สูงสุด 1 ล้านแถว ถ้าเกินให้ใช้ CSV หรือขอ Admin Export ผ่าน API</td></tr>
+          <tr><td>Formula คำนวณผิด?</td><td>ตรวจสอบประเภทข้อมูล (Data Type) ของคอลัมน์ — ตัวเลขที่เก็บเป็น Text จะคำนวณไม่ได้</td></tr>
+          <tr><td>Dashboard โหลดช้า?</td><td>ลดจำนวน Widget, ตั้ง Filter ที่เหมาะสม หรือใช้ Query Table แทนการ Join ใน Report</td></tr>
+          <tr><td>จะ Embed Dashboard ในเว็บได้ไหม?</td><td>ได้ — Share → Publish → Get Embed Code แล้วนำ <code>&lt;iframe&gt;</code> ไปวางในเว็บ</td></tr>
+          <tr><td>จะแชร์ Report ให้คนนอกบริษัทได้ไหม?</td><td>ได้ — Share → Set as Public → คัดลอก Public URL (ไม่ต้อง Login เพื่อดู)</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════ TIPS ═══════════════════════════ -->
+  <section class="section" id="tips">
+    <div class="section-header">
+      <span class="section-icon">💡</span>
+      <h3>Tips &amp; Tricks <span class="badge badge-all">ทุก Role</span></h3>
+    </div>
+    <div class="cards">
+      <div class="card">
+        <div class="card-icon">⌨️</div>
+        <h4>Keyboard Shortcuts</h4>
+        <p><code>Ctrl+S</code> บันทึก Report / Dashboard<br><code>Ctrl+Z</code> Undo การแก้ไข<br><code>F5</code> Refresh ข้อมูลใน Report</p>
+      </div>
+      <div class="card">
+        <div class="card-icon">📌</div>
+        <h4>Pin รายการโปรด</h4>
+        <p>คลิกขวาที่ Report หรือ Dashboard → <strong>Add to Favorites</strong> เพื่อเข้าถึงได้รวดเร็วจาก Home</p>
+      </div>
+      <div class="card">
+        <div class="card-icon">📧</div>
+        <h4>Email Scheduling</h4>
+        <p>เปิด Report → Share → Schedule → ตั้งเวลาส่งอีเมลอัตโนมัติ รองรับ Daily / Weekly / Monthly</p>
+      </div>
+      <div class="card">
+        <div class="card-icon">📱</div>
+        <h4>Zoho Analytics App</h4>
+        <p>ดาวน์โหลด App บน iOS / Android เพื่อดู Dashboard บนมือถือได้ทุกที่ทุกเวลา</p>
+      </div>
+      <div class="card">
+        <div class="card-icon">🎨</div>
+        <h4>Custom Theme</h4>
+        <p>Dashboard → Edit → Theme เลือกสีหรือ Upload Logo เพื่อให้ตรง Branding องค์กร</p>
+      </div>
+      <div class="card">
+        <div class="card-icon">🔗</div>
+        <h4>Drill-down Link</h4>
+        <p>คลิก Bar ในกราฟ → Configure Drill Down → ลิงก์ไปยัง Report หรือ Dashboard อื่นได้</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <div style="text-align:center;padding:24px 0;color:var(--text-muted);font-size:12px;border-top:1px solid var(--border);margin-top:24px;">
+    📊 Zoho Analytics Playbook — TRACSaaS_PROD &nbsp;|&nbsp; IT-TRAC &nbsp;|&nbsp; อัปเดต: เมษายน 2569
+  </div>
+
+</main>
+
+<script>
+  // Active sidebar highlight on scroll
+  const sections = document.querySelectorAll('.section');
+  const links = document.querySelectorAll('.sidebar-link');
+
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        links.forEach(l => l.classList.remove('active'));
+        const id = e.target.getAttribute('id');
+        const active = document.querySelector(`.sidebar-link[href="#${id}"]`);
+        if (active) active.classList.add('active');
+      }
+    });
+  }, { threshold: 0.3 });
+
+  sections.forEach(s => observer.observe(s));
+</script>
+</body>
+</html>
